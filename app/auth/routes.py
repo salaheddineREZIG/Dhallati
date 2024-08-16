@@ -1,11 +1,11 @@
-from flask import redirect, url_for, flash, make_response, Blueprint, request, render_template
+from flask import redirect, url_for, flash, make_response, request, render_template
 from app import db, oauth
 from ..models import User
 from authlib.integrations.base_client.errors import AuthlibBaseError
 import os
 from app.functions import login_required
+from . import auth
 
-auth = Blueprint('auth', __name__)
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
