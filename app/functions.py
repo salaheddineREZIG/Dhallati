@@ -1,5 +1,5 @@
 from flask import request, redirect, url_for, flash
-from app.models import User
+from .auth.models import User
 from functools import wraps
 import requests
 import time

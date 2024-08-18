@@ -1,9 +1,8 @@
 from flask import redirect, url_for, flash, make_response, request, render_template
 from app import db, oauth
-from ..models import User
+from .models import User
 from authlib.integrations.base_client.errors import AuthlibBaseError
 import os
-from app.functions import login_required
 from . import auth
 
 
@@ -46,10 +45,14 @@ def callback():
                 google_id=profile['sub'],
                 email=profile['email'],
                 name=profile['name'],
-                picture=profile['picture']
+                profile_pic=profile['picture']
             )
             db.session.add(user)
             db.session.commit()
+        else:
+            user.last_login_at = datetime.utcnow()
+            db.session.commit()
+            
 
         # Process User info and create a response
         response = make_response(redirect(url_for("main.home")))
@@ -58,14 +61,15 @@ def callback():
         return response
 
     except AuthlibBaseError as e:
+        print(e)
         flash("Authentication failed. Please try again.", "danger")
         return redirect(url_for('auth.login'))
     except Exception as e:
+        print(e)
         flash("An error occurred. Please try again later.", "danger")
         return redirect(url_for('auth.login'))
 
 @auth.route('/logout')
-@login_required
 def logout(user):
     response = make_response(redirect(url_for("main.index")))
     response.set_cookie("id_token", "", expires=0)

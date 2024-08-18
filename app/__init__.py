@@ -30,6 +30,9 @@ def create_app():
     db.init_app(app)
     
     migrate.init_app(app, db)
+    
+    from app.auth.models import User, AuditLog
+    from app.lost_and_found.models import Item, Report, Notification, Match, Location, ItemImage
 
     # Register OAuth clients
     oauth.register(
@@ -46,11 +49,13 @@ def create_app():
 )
 
     
-    from app.main.routes import main as main_blueprint
-    from app.auth.routes import auth as auth_blueprint
+    from app.main import main as main_blueprint
+    from app.auth import auth as auth_blueprint
+    from app.lost_and_found import lost_and_found as lost_and_found_blueprint
     # Register blueprints
     app.register_blueprint(main_blueprint)
     app.register_blueprint(auth_blueprint)
+    app.register_blueprint(lost_and_found_blueprint)
 
     # Return the configured app
     return app
