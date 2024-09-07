@@ -11,5 +11,6 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///database.db')
     LAGH_UNI_DOMAIN = os.getenv('LAGH_UNI_DOMAIN')
     GOOGLE_TOKEN_INFO = os.getenv('GOOGLE_TOKEN_INFO')
+    UPLOAD_FOLDER = os.path.join('app','static', 'images', 'uploads')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     DEBUG = os.getenv('DEBUG', True)

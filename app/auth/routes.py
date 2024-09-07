@@ -3,13 +3,25 @@ from app import db, oauth
 from .models import User
 from authlib.integrations.base_client.errors import AuthlibBaseError
 import os
+from app.decorators import login_required
 from . import auth
+from .forms import LoginForm
+from datetime import datetime
 
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
-        return render_template('login.html')
+        form = LoginForm()
+        if form.validate_on_submit():
+            if request.cookies.get('id_token'):
+                flash("Already logged in", "info")
+                return redirect(url_for("main.home"))
+
+            google = oauth.create_client('google')
+            redirect_uri = url_for('auth.callback', _external=True)
+            return google.authorize_redirect(redirect_uri)
+        return render_template('login.html', form=form)
     else:
         if request.cookies.get('id_token'):
             flash("Already logged in", "info")
@@ -32,7 +44,7 @@ def callback():
         id_token = full_token['id_token']
         profile = full_token['userinfo']
 
-        if profile['hd'] != os.getenv('LAGH_UNI_DOMAIN'):
+        if not profile['email'].endswith(os.getenv('LAGH_UNI_DOMAIN')):
             flash("Only Lagh University emails are allowed", "danger")
             return make_response(redirect(url_for('main.index')))
 
@@ -70,7 +82,8 @@ def callback():
         return redirect(url_for('auth.login'))
 
 @auth.route('/logout')
-def logout(user):
+@login_required
+def logout():
     response = make_response(redirect(url_for("main.index")))
     response.set_cookie("id_token", "", expires=0)
     flash("Logged out successfully", "success")

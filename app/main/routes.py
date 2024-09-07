@@ -1,5 +1,5 @@
 from flask import render_template
-from app.functions import login_required
+from app.decorators import login_required
 from . import main
 
 @main.route('/')
