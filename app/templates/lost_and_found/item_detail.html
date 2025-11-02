@@ -1,0 +1,150 @@
+{% extends 'layout.html' %}
+
+{% block title %}Item Details - {{ item["name"] }}{% endblock %}
+
+{% block main %}
+<div class="container py-5">
+
+  <!-- Title -->
+  <div class="text-center mb-4">
+    <h1 class="display-5 fw-bold">{{ item["name"] }}</h1>
+    <p class="text-muted mb-0">
+      Category: {{ item["category_name"] or "Uncategorized" }}
+      • Status: <span class="badge bg-primary">{{ item["status"]|capitalize }}</span>
+    </p>
+  </div>
+
+  <div class="row g-4">
+    <!-- Left Column: Images -->
+    <div class="col-lg-6 col-md-12">
+      {% if item["images"] and item["images"]|length > 0 %}
+        <!-- Main Image -->
+        <div class="card shadow-sm mb-3">
+          {% set url = item['images'][0]['image_url']|replace('app\\','')|replace('\\','/') %}
+          <img src="{{ url if url.startswith('/') else '/' ~ url }}"
+               class="card-img-top img-fluid rounded"
+               alt="{{ item['name'] }}">
+        </div>
+
+        <!-- Thumbnails -->
+        {% if item["images"]|length > 1 %}
+        <div class="d-flex flex-wrap gap-2">
+          {% for image in item["images"][1:] %}
+            {% set url = image['image_url']|replace('app\\','')|replace('\\','/') %}
+            <img src="{{ url if url.startswith('/') else '/' ~ url }}"
+                 class="img-thumbnail"
+                 style="width:100px; height:100px; object-fit:cover;"
+                 alt="{{ item['name'] }} thumbnail">
+          {% endfor %}
+        </div>
+        {% endif %}
+      {% else %}
+        <div class="card shadow-sm mb-3">
+          <img src="{{ url_for('static', filename='images/default.png') }}"
+               class="card-img-top img-fluid rounded"
+               alt="No image available">
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Right Column: Details -->
+    <div class="col-lg-6 col-md-12">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <h4 class="card-title mb-3">Item Information</h4>
+          <p class="card-text">{{ item["description"] or "No description provided." }}</p>
+
+          <ul class="list-group list-group-flush mb-4">
+            <li class="list-group-item">
+              <strong>Reported by:</strong> {{ item["reporter_name"] or "Anonymous" }}
+            </li>
+            <li class="list-group-item">
+                {% if item["status"] == 'lost' %}
+
+                    <strong>lost at:</strong> {{ item["claimed_at"] or "N/A" }}
+                {% else %}
+                    <strong>found at:</strong> {{ item["claimed_at"] or "N/A" }}
+                {% endif %}
+            </li>
+          </ul>
+
+          <ul class="list-group list-group-flush mb-4">
+            <li class="list-group-item">
+              <strong>Report Type:</strong> {{ report["report_type"]|capitalize }}
+            </li>
+            <li class="list-group-item">
+              <strong>Location Reported:</strong> {{ report["location_reported"] or "N/A" }}
+            </li>
+            <li class="list-group-item">
+              <strong>Additional Details:</strong> {{ report["additional_details"] or "N/A" }}
+            </li>
+            <li class="list-group-item">
+              <strong>Report Created:</strong> {{ report["created_at"] }}
+            </li>
+          </ul>
+
+          <!-- Claim logic -->
+          {% if item["status"] == 'lost' %}
+            <div class="alert alert-warning">
+              This item is marked as <strong>lost</strong>. If you believe you found it, request admin review.
+            </div>
+          {% endif %}
+
+          {% if item["status"] == 'found' %}
+            <div class="alert alert-warning">
+              This item is marked as <strong>found</strong>. If you believe it is yours, request a claim.
+            </div>
+          {% endif %}
+
+          {% if item["status"] != 'claimed' %}
+            <button id="claim-btn" class="btn btn-success w-100 mb-2">
+                Request to Claim this Item
+            </button>
+          {% else %}
+            <div class="alert alert-success">Already claimed.</div>
+          {% endif %}
+
+          <a href="{{ url_for('lost_and_found.lost_and_found_page') }}"
+             class="btn btn-outline-secondary w-100">
+            Back to Lost & Found
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function claimItem(itemId) {
+    const confirmOk = confirm("Request a claim for this item? This will notify the admin and create a pending claim.");
+    if (!confirmOk) return;
+
+    try {
+        const res = await fetch(`/lost_and_found/api/claim/${itemId}`, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: "I believe this is mine" })
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || res.statusText);
+
+        alert(data.message || "Claim request sent.");
+        const btn = document.getElementById('claim-btn');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerText = "Claim requested";
+        }
+    } catch (err) {
+        console.error(err);
+        alert("Failed to create claim request: " + (err.message || err));
+    }
+}
+</script>
+{% endblock %}

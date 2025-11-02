@@ -7,113 +7,270 @@
     <div class="text-center mb-5">
         <h1 class="display-4">Lost and Found</h1>
     </div>
-    <div class="row justify-content-center text-center mb-4">
-        <div class="col-lg-8 col-md-10">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h2 class="card-title text-center">Report Item</h2>
-                    <form method="POST" enctype="multipart/form-data" id="lost-form" class="mt-4">
-                        {{ form.hidden_tag() }}
-                        {% for subfield in form.report_type %}
-                            <div class="form-check ">
-                                {{ subfield.label(class="form-check-label") }}
-                                {{ subfield(class="form-check-input") }}
-                            </div>
-                        {% endfor %}
-                        <div class="form-check form-switch mb-3 mt-3">
-                            {{ form.is_anonymous(class="form-check-input", type="checkbox", role="switch") }}
-                            {{ form.is_anonymous.label(class="form-check-label") }}
+    <div class="row text-center mb-4">
+        <div class="col-md-4">
+            <button class="btn btn-outline-secondary btn-lg w-100 mb-3" id="report-items-button">Report Item</button>
+        </div>
+        <div class="col-md-4">
+            <button class="btn btn-outline-secondary btn-lg w-100 mb-3" id="lost-items-button">Browse Lost Items</button>
+        </div>
+        <div class="col-md-4">
+            <button class="btn btn-outline-secondary btn-lg w-100 mb-3" id="found-items-button">Browse Found Items</button>
+        </div>
+    </div>
+    <div class="text-center" id="report-items-section" style="display: none">
+        <div class="row justify-content-center text-center mt-4">
+            <div class="d-flex justify-content-center">
+                <div class="col-lg-8 col-md-10">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h2 class="card-title text-center">Report Item</h2>
+                            <form method="POST" enctype="multipart/form-data" id="report-form" class="mt-4">
+                                {{ form.hidden_tag() }}
+                                {% for subfield in form.report_type %}
+                                    <div class="form-check">
+                                        {{ subfield.label(class="form-check-label") }}
+                                        {{ subfield(class="form-check-input") }}
+                                    </div>
+                                {% endfor %}
+                                <div class="form-check form-switch mb-3 mt-3">
+                                    {{ form.is_anonymous(class="form-check-input", type="checkbox", role="switch") }}
+                                    {{ form.is_anonymous.label(class="form-check-label") }}
+                                </div>
+                                <div class="mb-3">
+                                    {{ form.name.label(class="form-label") }}
+                                    {{ form.name(class="form-control") }}
+                                </div>
+                                <div class="mb-3">
+                                    {{ form.description.label(class="form-label") }}
+                                    {{ form.description(class="form-control") }}
+                                </div>
+                                <div class="mb-3">
+                                    {{ form.category.label(class="form-label") }}
+                                    {{ form.category(class="form-select") }}
+                                </div>
+                                <div class="mb-3">
+                                    {{ form.location_reported.label(class="form-label") }}
+                                    {{ form.location_reported(class="form-control") }}
+                                </div>
+                                <div class="mb-3">
+                                    {{ form.event_datetime.label(class="form-label") }}
+                                    <input type="datetime-local" class="form-control" 
+                                        id="{{ form.event_datetime.id }}" 
+                                        name="{{ form.event_datetime.name }}" 
+                                        value="{{ form.event_datetime.data.strftime('%Y-%m-%dT%H:%M') if form.event_datetime.data else '' }}">
+                                </div>
+                                <div class="mb-3">
+                                    {{ form.images.label(class="form-label") }}
+                                    {{ form.images(class="form-control") }}
+                                </div>
+                                <div class="mb-3">
+                                    {{ form.additional_details.label(class="form-label") }}
+                                    {{ form.additional_details(class="form-control") }}
+                                </div>
+                                <div class="mb-3">
+                                    {{ form.contact_info.label(class="form-label") }}
+                                    {{ form.contact_info(class="form-control") }}
+                                </div>
+                                <div class="d-grid">
+                                    {{ form.submit(class="btn btn-primary btn-lg") }}
+                                </div>
+                            </form>
                         </div>
-
-                        <div class="mb-3">
-                            {{ form.name.label(class="form-label") }}
-                            {{ form.name(class="form-control") }}
-                        </div>
-
-                        <div class="mb-3">
-                            {{ form.description.label(class="form-label") }}
-                            {{ form.description(class="form-control") }}
-                        </div>
-
-                        <div class="mb-3">
-                            {{ form.category.label(class="form-label") }}
-                            {{ form.category(class="form-select") }}
-                        </div>
-
-                        <div class="mb-3">
-                            {{ form.location_reported.label(class="form-label") }}
-                            {{ form.location_reported(class="form-control") }}
-                        </div>
-
-                        <div class="mb-3">
-                            {{ form.event_datetime.label(class="form-label") }}
-                            <input type="datetime-local" class="form-control" 
-                                   id="{{ form.event_datetime.id }}" 
-                                   name="{{ form.event_datetime.name }}" 
-                                   value="{{ form.event_datetime.data.strftime('%Y-%m-%dT%H:%M') if form.event_datetime.data else '' }}">
-                        </div>
-                        
-
-                        <div class="mb-3">
-                            {{ form.images.label(class="form-label") }}
-                            {{ form.images(class="form-control") }}
-                        </div>
-
-                        <div class="mb-3">
-                            {{ form.additional_details.label(class="form-label") }}
-                            {{ form.additional_details(class="form-control") }}
-                        </div>
-
-                        <div class="mb-3">
-                            {{ form.contact_info.label(class="form-label") }}
-                            {{ form.contact_info(class="form-control") }}
-                        </div>
-
-                        <div class="d-grid">
-                            {{ form.submit(class="btn btn-primary btn-lg") }}
-                        </div>
-                    </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="report-items"></div>
+    <div class="text-center" id="lost-items-section" style="display: none">
+        <div class="row justify-content-center text-center mt-4">
+            <div class="d-flex justify-content-center">
+                <div class="col-lg-8 col-md-10">
+                    <div id="lost-items"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row text-center mb-4">
-        <div class="col-md-6">
-            <a href="#" class="btn btn-outline-secondary btn-lg w-100 mb-3">Browse Lost Items</a>
-        </div>
-        <div class="col-md-6">
-            <a href="#" class="btn btn-outline-secondary btn-lg w-100 mb-3">Browse Found Items</a>
+    <div class="text-center" id="found-items-section" style="display: none">
+        <div class="row justify-content-center text-center mt-4">
+            <div class="d-flex justify-content-center">
+                <div class="col-lg-8 col-md-10">
+                    <div id="found-items"></div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <script type="text/javascript">
-    document.addEventListener("DOMContentLoaded", async function() {
-        document.getElementById("lost-form").addEventListener("submit", async function(event) {
-            event.preventDefault();
-
-            let formData = new FormData(event.target); 
-            formData.append("csrf_token", "{{ csrf_token }}");
-            let response = await fetch("/lost_and_found/api/lost", {
-                method: "POST",
-                body: formData,
-            });
+    async function fetchItems(type) {
+        try {
+            let response = await fetch("/lost_and_found/api?type="+type);
             if (!response.ok) {
-                alert("Error: " + response.statusText);
-                return;
+                throw new Error("Network response was not ok");
             }
-            let data = await response.json();
-            console.log(data);
+            let Data = await response.json();
+    
+            let reports = document.getElementById(type+"-items");
+    
+            // Clear the sections before populating them
+            reports.innerHTML = '';
+    
+            // Filter the data for lost and found items separately
 
-            document.getElementById("flash-message").setAttribute("class", "alert alert-success alert-dismissible fade show");
-            document.getElementById("flash-message").setAttribute("role", "alert");
-            document.getElementById("flash-message").innerHTML = "Your item has been reported.";
+    
+            // Handle Lost Items
+            if (Data.length == 0) {
+                reports.innerHTML = `<div class="alert alert-info">No ${type} items found.</div>`;
+            } else {
+                Data.forEach(item => {
+                    // Create the card container
+                    let card = document.createElement("div");
+                    card.setAttribute("class", "card shadow-sm mb-3");
+                    
+                    // Create a Bootstrap row for layout
+                    let row = document.createElement("div");
+                    row.setAttribute("class", "row g-0 align-items-center");
+                
+                    // Create the image column (right side)
+                    let imgCol = document.createElement("div");
+                    imgCol.setAttribute("class", "col-md-4");  // Adjust size based on layout
+                    let img = document.createElement("img");
+                    img.setAttribute("class", "img-fluid rounded-end");  // Ensure the image is responsive
+                    img.setAttribute("alt", item["name"]);
+                    if( item["images"] && item["images"].length > 0) {
+                       let imageUrl = item["images"][0]["image_url"];
 
+                        imageUrl = imageUrl.replace(/^app\\/, "").replace(/\\/g, "/");
 
-            event.target.reset();
+                        img.setAttribute("src", imageUrl);
+
+                    } else {
+                        img.setAttribute("src", "{{url_for('static', filename='images/default.png')}}");  // Fallback to a default image if no image is available
+                    }
+                    
+                
+                    imgCol.appendChild(img);
+                
+                    // Create the text content column (left side)
+                    let contentCol = document.createElement("div");
+                    contentCol.setAttribute("class", "col-md-8");
+                
+                    let cardBody = document.createElement("div");
+                    cardBody.setAttribute("class", "card-body");
+                
+                    // Card title (name), bolded
+                    let cardTitle = document.createElement("h2");
+                    cardTitle.setAttribute("class", "card-title fw-bold");
+                    cardTitle.innerHTML = item["name"];
+                
+                    // Card text (description)
+                    let cardText = document.createElement("p");
+                    cardText.setAttribute("class", "card-text");
+                    let desc = item["description"] || "";
+                    cardText.innerHTML = desc.length > 100 ? desc.slice(0, 100) + "..." : desc;
+                
+                    // "See more" link
+                    let seeMoreLink = document.createElement("a");
+                    seeMoreLink.setAttribute("href", `/lost_and_found/item?id=${item["id"]}`);
+                    seeMoreLink.setAttribute("class", "btn btn-primary");
+                    seeMoreLink.innerHTML = "See more";
+                
+                    // Append title, description, and link to the body
+                    cardBody.appendChild(cardTitle);
+                    cardBody.appendChild(cardText);
+                    cardBody.appendChild(seeMoreLink);
+                
+                    // Append body to the content column
+                    contentCol.appendChild(cardBody);
+                
+                    // Append columns to the row
+                    row.appendChild(contentCol);
+                    row.appendChild(imgCol);
+                
+                    // Append row to the card
+                    card.appendChild(row);
+                
+                    // Append the card to the main container (reports)
+                    reports.appendChild(card);
+                });
+                ;
+            }
+            // Handle Found Items
+        } catch (error) {
+            console.error("Fetch error: ", error);
+            alert("Failed to fetch items.");
+        }
+    }
+    
+    
+
+    async function submitReport(event) {
+    event.preventDefault();
+    let formData = new FormData(event.target);
+
+    try {
+        let response = await fetch("/lost_and_found/api", {
+            method: "POST",
+            body: formData,
         });
 
+        if (!response.ok) {
+            throw new Error("Error: " + response.statusText);
+        }
+
+        let data = await response.json();
+
+        // Reset form
+        event.target.reset();
+
+        // Switch to "lost" items after report
+        toggleSections("lost");
+        await fetchItems("lost");
+        document.getElementById("flash-message").innerHTML = `
+           Report submitted successfully!
+        `;
+
+    } catch (error) {
+        console.error("Submit error: ", error);
+        alert("Failed to submit the report.");
+    }
+}
+
+
+    function toggleSections(showSectionId) {
+        const sections = ['report', 'lost', 'found'];
+        sections.forEach(section => {
+            document.getElementById(section+"-items-section").style.display = (section === showSectionId) ? 'block' : 'none';
+            if (showSectionId=== 'lost') {
+                document.getElementById("found-items").innerHTML = '';
+            }
+            else if (showSectionId=== 'found') {
+                document.getElementById("lost-items").innerHTML = '';
+            }
+
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", async function() {
+        document.getElementById("report-form").addEventListener("submit", async (event) => await submitReport(event));
+
+        document.getElementById("report-items-button").addEventListener("click", function() {
+            toggleSections('report');
+        });
+
+        document.getElementById("lost-items-button").addEventListener("click", function() {
+            toggleSections('lost');
+            fetchItems('lost');
+            
+        });
+        
+        document.getElementById("found-items-button").addEventListener("click", function() {
+            toggleSections('found');
+            fetchItems('found');
+        });
     });
 </script>
 {% endblock %}

@@ -2,7 +2,9 @@
 
 --INSERT INTO categories VALUES (2, 'Clothing','Jackets,jewelry,hats etc');
 
---DELETE FROM categories;
+SELECT * FROM audit_logs;
+
+SELECT * FROM users;
 
 -- Insert main categories into the categories table
 
@@ -15,8 +17,11 @@
 --('ID Cards & Documents', 'Personal identification and important documents.'),
 --('Sports Equipment', 'Equipment and accessories for sports activities.'),
 --('Miscellaneous', 'Other items not fitting into the above categories.');
-
---SELECT * FROM categories;
 SELECT * FROM items;
+SELECT * FROM categories;
 SELECT * FROM reports;
 SELECT * FROM item_images;
+--.tables
+--DELETE FROM items;
+--DELETE FROM item_images;
+--DELETE FROM reports;

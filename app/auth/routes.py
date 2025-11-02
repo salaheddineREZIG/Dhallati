@@ -7,6 +7,9 @@ from app.decorators import login_required
 from . import auth
 from .forms import LoginForm
 from datetime import datetime
+from app.functions import log_action
+import requests
+
 
 
 @auth.route('/login', methods=['GET', 'POST'])
@@ -18,9 +21,17 @@ def login():
                 flash("Already logged in", "info")
                 return redirect(url_for("main.home"))
 
-            google = oauth.create_client('google')
-            redirect_uri = url_for('auth.callback', _external=True)
-            return google.authorize_redirect(redirect_uri)
+            try:
+                google = oauth.create_client('google')
+                redirect_uri = url_for('auth.callback', _external=True)
+                return google.authorize_redirect(redirect_uri)
+            except requests.exceptions.ConnectionError:
+                flash("Unable to connect to Google. Please check your internet connection.", "danger")
+                return redirect(url_for('auth.login'))
+            except Exception as e:
+                print(e)
+                flash("An unexpected error occurred.", "danger")
+                return redirect(url_for('auth.login'))
         return render_template('login.html', form=form)
     else:
         if request.cookies.get('id_token'):
@@ -61,9 +72,14 @@ def callback():
             )
             db.session.add(user)
             db.session.commit()
+            # Log user creation in AuditLog
+            log_action(user.id, 'users', user.id, 'create', changes=f"User {user.email} created.")
+                
         else:
             user.last_login_at = datetime.utcnow()
             db.session.commit()
+            # Log user login in AuditLog
+            log_action(user.id, 'users', user.id, 'login', changes=f"User {user.email} logged in.")
             
 
         # Process User info and create a response
@@ -83,8 +99,10 @@ def callback():
 
 @auth.route('/logout')
 @login_required
-def logout():
+def logout(user):
     response = make_response(redirect(url_for("main.index")))
     response.set_cookie("id_token", "", expires=0)
     flash("Logged out successfully", "success")
+    log_action(user['id'], 'users', user['id'], 'logout', changes=f"User {user['email']} logged out.")
+    print(f"User {user['email']} logged out.")
     return response

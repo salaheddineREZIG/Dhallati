@@ -2,17 +2,16 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SelectField, DateTimeField, BooleanField, MultipleFileField, RadioField, SubmitField
 from wtforms.validators import DataRequired, Optional
 from flask_wtf.file import FileAllowed
-from app.constants import ITEM_STATUS, REPORT_TYPE
-
+from app.lost_and_found.models import ReportType
 class ReportItemForm(FlaskForm):
     report_type = RadioField(
         'Report Type', 
-        choices=[(report_type, report_type.capitalize()) for report_type in REPORT_TYPE], 
+        choices=[(report_type, report_type.capitalize()) for report_type in ReportType.__members__.keys()], 
         validators=[DataRequired()]
     )
     name = StringField('Item Name', validators=[DataRequired()])
     description = TextAreaField('Description', validators=[Optional()])
-    category = SelectField('Category', coerce=int, validators=[DataRequired()])
+    category = SelectField('Category' ,coerce=int, validators=[DataRequired()])
     location_reported = StringField('Location Reported', validators=[Optional()])
     event_datetime = DateTimeField(
         'Event DateTime', 
