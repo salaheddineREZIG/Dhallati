@@ -121,15 +121,20 @@ def report_item():
                     contact_info=form.contact_info.data
                 )
                 db.session.add(new_report)
+                print(form.report_type.data)
                 db.session.commit()
                 log_action(1, 'reports', new_report.id, 'create', changes=f"Report for item {new_item.name} created.")
                 flash("Report successfully submitted", "success")
-                return jsonify({"message": "Report successfully submitted", "item_id": new_item.id}), 200
+                return redirect(url_for('lost_and_found.lost_and_found_page', show=form.report_type.data.lower()))
 
             except Exception as e:
-                return jsonify({"error": str(e)}), 500
+                db.session.rollback()
+                print(e)
+                flash(f"An error occurred, please try again", "danger")
+                return redirect(url_for('lost_and_found.lost_and_found_page'))
         else:
-            return jsonify({"error": form.errors}), 400
+            flash("Form validation failed. Please check your inputs.", "danger")
+            return redirect(url_for('lost_and_found.lost_and_found_page'))
 
     elif request.method == 'GET':              
         type = request.args.get('type')  

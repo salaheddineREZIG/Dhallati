@@ -4,6 +4,11 @@
 
 {% block main %}
 <div class="container py-5">
+     <div class="text-start mb-3">
+        <a href="{{ url_for('main.home') }}" class="btn btn-outline-secondary">
+            ← Back to Home
+        </a>
+    </div>
     <div class="text-center mb-5">
         <h1 class="display-4">Lost and Found</h1>
     </div>
@@ -25,7 +30,7 @@
                     <div class="card shadow-sm">
                         <div class="card-body">
                             <h2 class="card-title text-center">Report Item</h2>
-                            <form method="POST" enctype="multipart/form-data" id="report-form" class="mt-4">
+                            <form method="POST" action="{{ url_for('lost_and_found.report_item') }}" enctype="multipart/form-data">
                                 {{ form.hidden_tag() }}
                                 {% for subfield in form.report_type %}
                                     <div class="form-check">
@@ -255,8 +260,14 @@
     }
 
     document.addEventListener("DOMContentLoaded", async function() {
-        document.getElementById("report-form").addEventListener("submit", async (event) => await submitReport(event));
-
+        //document.getElementById("report-form").addEventListener("submit", async (event) => await submitReport(event));
+        const params = new URLSearchParams(window.location.search);
+        const show = params.get('show');
+        if (show === 'lost' || show === 'found' || show === 'report') {
+            toggleSections(show);
+            if (show === 'lost') fetchItems('lost');
+            if (show === 'found') fetchItems('found');
+        }
         document.getElementById("report-items-button").addEventListener("click", function() {
             toggleSections('report');
         });
