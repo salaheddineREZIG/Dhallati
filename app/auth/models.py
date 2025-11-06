@@ -39,6 +39,7 @@ class User(db.Model):
             'name': self.name,
             'profile_pic': self.profile_pic,
             'email': self.email,
+            'created_at': self.created_at.strftime('%Y-%m-%d') if self.created_at else None,
         }
         if public:
             return base
@@ -46,7 +47,6 @@ class User(db.Model):
         base.update({
             'google_id': self.google_id,
             'is_active': self.is_active,
-            'created_at': self.created_at.isoformat() if self.created_at else None,
             'last_login_at': self.last_login_at.isoformat() if self.last_login_at else None,
         })
         return base

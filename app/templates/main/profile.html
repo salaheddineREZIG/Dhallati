@@ -1,0 +1,150 @@
+{% extends 'layout.html' %}
+
+{% block title %}Profile - {{ user.name if user else 'Profile' }}{% endblock %}
+
+{% block extras %}
+<style>
+  /* Small custom tweaks */
+  .profile-card { border-radius: 16px; overflow: hidden; }
+  .profile-header { background: linear-gradient(90deg, rgba(2,6,23,0.9), rgba(45,55,72,0.95)); color: white; }
+  .avatar { width: 140px; height: 140px; object-fit: cover; border-radius: 50%; border: 4px solid rgba(255,255,255,0.9); }
+  .stat { font-weight: 700; font-size: 1.05rem; }
+  .small-muted { color: #6c757d; font-size: 0.9rem; }
+  .action-btns .btn { min-width: 140px; }
+  @media (max-width: 575px) { .avatar { width: 110px; height: 110px; } }
+</style>
+{% endblock %}
+
+{% block main %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div id="profile-flash" class="mb-3"></div>
+
+      <!-- Profile card -->
+      <div class="card profile-card shadow-sm">
+        <div class="card-body p-0">
+          <div class="row g-0 align-items-center profile-header p-4">
+            <div class="col-md-3 text-center">
+              <img src="{{ user.profile_pic if user and user.profile_pic else url_for('static', filename='images/default-avatar.png') }}" alt="{{ user.name }}" class="avatar mb-2" id="profile-avatar">
+              <div class="small-muted">Member since <strong>{{ user.created_at if user and user.get('created_at') else '—' }}</strong></div>
+            </div>
+            <div class="col-md-6 text-md-start text-center mt-3 mt-md-0">
+              <h2 class="mb-1">{{ user.name if user else 'User Name' }}</h2>
+              <p class="mb-1 small-muted">{{ user.email if user else 'email@example.com' }}</p>
+            </div>
+            <div class="col-md-3 text-md-end text-center mt-3 mt-md-0 action-btns">
+              <a href="{{ url_for('main.home') }}" class="btn btn-outline-light me-2">Home</a>
+            </div>
+          </div>
+
+          <div class="row g-0 p-4">
+            <div class="col-md-4 border-end text-center">
+              <div class="mb-2 small-muted">Reports submitted</div>
+              <div class="stat">{{ stats.get('reports', [])|length }}</div>
+            </div>
+            <div class="col-md-4 border-end text-center">
+              <div class="mb-2 small-muted">Items claimed</div>
+              <div class="stat">{{ stats.get('items_claimed', 0) }}</div>
+            </div>
+            <div class="col-md-4 text-center">
+              <div class="mb-2 small-muted">Active listings</div>
+              <div class="stat">{{ stats.get('active_items', 0) }}</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Main content: left column - recent reports, right column - actions / details -->
+      <div class="row mt-4">
+        <div class="col-lg-8">
+          <div class="card shadow-sm mb-3">
+            <div class="card-body">
+              <h5 class="card-title">Recent Reports</h5>
+              {% if stats.reports and stats.reports|length > 0 %}
+                <div class="list-group list-group-flush">
+                  {% for r in stats.reports %}
+                    <a href="{{ url_for('lost_and_found.item', id=r.id) }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-start">
+                      <div>
+                        <div class="fw-bold">{{ r.name }}</div>
+                        <div class="small-muted">{{ r.location_reported }} • {{ r.report_type|capitalize }} • {{ r.created_at if r.get('created_at') else '—' }}</div>
+                      </div>
+                      <div class="text-end">
+                        <span class="badge bg-secondary">{{ r.status }}</span>
+                      </div>
+                    </a>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <div class="text-center small-muted py-4">No recent reports.</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">Account Details</h5>
+              <dl class="row mb-0">
+                <dt class="col-sm-4 small-muted">Full name</dt>
+                <dd class="col-sm-8">{{ user.name }}</dd>
+
+                <dt class="col-sm-4 small-muted">Email</dt>
+                <dd class="col-sm-8">{{ user.email }}</dd>
+                <dt class="col-sm-4 small-muted">Member ID</dt>
+                <dd class="col-sm-8">{{ user.id }}</dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="card shadow-sm mb-3">
+            <div class="card-body text-center">
+              <h6>Quick Actions</h6>
+              <div class="d-grid gap-2">
+                <a href="{{ url_for('lost_and_found.lost_and_found_page') }}" class="btn btn-primary">Report an Item</a>
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-danger">Logout</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h6 class="card-title">Contact</h6>
+              <p class="small-muted mb-1">If someone needs to reach you regarding a report, they will see your contact info as provided in each report (if not anonymous).</p>
+              <p class="mb-0"><small class="text-muted">Email: </small> <br>{{ user.email }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+{% block scripts %}
+<script>
+  // Preview uploaded profile picture in modal
+  document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('profile-pic-input');
+    const preview = document.getElementById('avatar-preview-modal');
+    const mainAvatar = document.getElementById('profile-avatar');
+    if (input) {
+      input.addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) return;
+        const reader = new FileReader();
+        reader.onload = function (ev) {
+          preview.src = ev.target.result;
+        }
+        reader.readAsDataURL(file);
+      });
+    }
+  });
+</script>
+{% endblock %}
+
+{% endblock %}

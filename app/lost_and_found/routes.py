@@ -23,8 +23,8 @@ def lost_and_found_page(user):
         form.category.choices = [(category.id, category.name) for category in Category.query.all()]
         return render_template('lost_and_found.html', form=form)
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
+        flash(f"An error occurred: {str(e)}", "danger")
+        return redirect(url_for('main.home'))
 @lost_and_found.route('/lost_and_found/api', methods=['POST', 'GET','PUT', 'DELETE'])
 def report_item():
     if request.method == 'POST':
@@ -164,13 +164,16 @@ def item(user):
         
         item_id = request.args.get('id')
         if not item_id:
-            return jsonify({"error": "Item ID is required"}), 400
+            flash("Item ID is required", "danger")
+            return redirect(url_for('main.home'))
         item = Item.query.filter_by(id=item_id).first()
         if not item:
-            return jsonify({"error": "Item not found"}), 404
+            flash("Item not found", "danger")
+            return redirect(url_for('main.home'))
         report = Report.query.filter_by(item_id=item_id).first()
         if not report:
-            return jsonify({"error": "Report not found"}), 404
+            flash("Report not found for this item", "danger")
+            return redirect(url_for('main.home'))
         item = item.to_dict()        
         report = report.to_dict()
         
@@ -178,5 +181,5 @@ def item(user):
         return render_template('item_detail.html', item=item, report=report)
     
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    
+        flash(f"An error occurred: {str(e)}", "danger")
+        return redirect(url_for('main.home'))

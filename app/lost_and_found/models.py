@@ -136,8 +136,8 @@ class Report(db.Model):
             'report_type': enum_to_str(self.report_type),
             'location_reported': self.location_reported,
             'additional_details': self.additional_details,
-            'created_at': self.created_at.isoformat() if self.created_at else None,
-            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M') if self.created_at else None,
+            'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M') if self.updated_at else None,
             'is_anonymous': self.is_anonymous,
             'reporter_name': None,
             'contact_info': None
