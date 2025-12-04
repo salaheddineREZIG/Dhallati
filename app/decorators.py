@@ -1,5 +1,5 @@
 # app/decorators.py
-from flask import request, redirect, url_for, flash, make_response
+from flask import request, redirect, url_for, flash, make_response, current_app
 from functools import wraps
 import requests
 import time
@@ -40,13 +40,16 @@ def login_required(f):
 
             if not user:
                 flash("Invalid token. Please log in again.", "danger")
-                return redirect(url_for('auth.login'))
-
+                Response = make_response(redirect(url_for('auth.login')))
+                Response.set_cookie("id_token", "", expires=0)
+                return Response
             return f(user.to_dict(), *args, **kwargs)
 
         except Exception as e:
-            print("error in login_required:",e)
+            current_app.logger.exception("Error verifying token in login_required decorator: %s", e)
+            Response = make_response(redirect(url_for('auth.login')))
+            Response.set_cookie("id_token", "", expires=0)
             flash("An error occurred. Please log in again.", "danger")
-            return redirect(url_for('auth.login'))
+            return Response
 
     return decorated_function

@@ -45,7 +45,7 @@ def create_app():
     }
 )
 
-    
+        
     from app.main import main as main_blueprint
     from app.auth import auth as auth_blueprint
     from app.lost_and_found import lost_and_found as lost_and_found_blueprint

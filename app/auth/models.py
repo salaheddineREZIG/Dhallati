@@ -1,7 +1,6 @@
-# app/auth/models.py
 from datetime import datetime
 import enum
-from sqlalchemy import func
+from sqlalchemy import func, Index, CheckConstraint
 from app import db
 
 
@@ -15,11 +14,10 @@ class User(db.Model):
     profile_pic = db.Column(db.String(512))
     is_active = db.Column(db.Boolean, default=True, nullable=False)
 
-    # Use timezone-aware timestamps and DB-level defaults where possible
     created_at = db.Column(db.DateTime(timezone=True), server_default=func.now(), nullable=False)
     last_login_at = db.Column(db.DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 
-    # Relationships: load lists by default (lazy='select') which is more convenient for serialization.
+    # Relationships
     items_reported = db.relationship('Item', foreign_keys='Item.reporter_id', back_populates='reporter', lazy='select')
     reports = db.relationship('Report', back_populates='reporter', lazy='select')
     notifications = db.relationship('Notification', back_populates='user', lazy='select')
@@ -29,11 +27,6 @@ class User(db.Model):
         return f"<User id={self.id} name={self.name!r}>"
 
     def to_dict(self, public: bool = True):
-        """
-        Serialize user.
-        - public=True returns only non-sensitive fields (for frontend / public APIs).
-        - public=False returns internal fields (email, google_id) for admin/internal use.
-        """
         base = {
             'id': self.id,
             'name': self.name,
@@ -43,7 +36,6 @@ class User(db.Model):
         }
         if public:
             return base
-        # internal view
         base.update({
             'google_id': self.google_id,
             'is_active': self.is_active,
@@ -58,10 +50,10 @@ class AuditLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     table_name = db.Column(db.String(100), nullable=False, index=True)
     record_id = db.Column(db.Integer, nullable=False, index=True)
-    action = db.Column(db.String(50), nullable=False)  # insert, update, delete
+    action = db.Column(db.String(50), nullable=False)
     performed_by = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='SET NULL'), nullable=True)
     performed_at = db.Column(db.DateTime(timezone=True), server_default=func.now(), nullable=False)
-    changes = db.Column(db.Text)  
+    changes = db.Column(db.Text)
 
     user = db.relationship('User', back_populates='audit_logs')
 

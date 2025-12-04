@@ -21,20 +21,25 @@
         <!-- Main Image -->
         <div class="card shadow-sm mb-3">
           {% set url = item['images'][0]['image_url']|replace('app\\','')|replace('\\','/') %}
+
+          {# Clean the path - remove app\\ prefixes and fix slashes #}
           <img src="{{ url if url.startswith('/') else '/' ~ url }}"
                class="card-img-top img-fluid rounded"
-               alt="{{ item['name'] }}">
+               alt="{{ item['name'] }}"
+               style="max-height: 400px; object-fit: cover;"
+               id="main-image">
         </div>
 
         <!-- Thumbnails -->
         {% if item["images"]|length > 1 %}
         <div class="d-flex flex-wrap gap-2">
           {% for image in item["images"][1:] %}
-            {% set url = image['image_url']|replace('app\\','')|replace('\\','/') %}
+          {% set url = image['image_url']|replace('app\\','')|replace('\\','/') %}
             <img src="{{ url if url.startswith('/') else '/' ~ url }}"
                  class="img-thumbnail"
-                 style="width:100px; height:100px; object-fit:cover;"
-                 alt="{{ item['name'] }} thumbnail">
+                 style="width:100px; height:100px; object-fit:cover; cursor: pointer;"
+                 alt="{{ item['name'] }} thumbnail"
+                 onclick="document.getElementById('main-image').src = this.src">
           {% endfor %}
         </div>
         {% endif %}
@@ -42,7 +47,9 @@
         <div class="card shadow-sm mb-3">
           <img src="{{ url_for('static', filename='images/default.png') }}"
                class="card-img-top img-fluid rounded"
-               alt="No image available">
+               alt="No image available"
+               style="max-height: 400px; object-fit: cover;"
+               id="main-image">
         </div>
       {% endif %}
     </div>
@@ -59,13 +66,17 @@
               <strong>Reported by:</strong> {{ item["reporter_name"] or "Anonymous" }}
             </li>
             <li class="list-group-item">
-                {% if item["status"] == 'lost' %}
-
-                    <strong>lost at:</strong> {{ item["claimed_at"] or "N/A" }}
-                {% else %}
-                    <strong>found at:</strong> {{ item["claimed_at"] or "N/A" }}
-                {% endif %}
+              {% if item["status"]|lower == 'lost' %}
+                <strong>Reported lost on:</strong> {{ item["created_at"][:10] if item["created_at"] else "N/A" }}
+              {% else %}
+                <strong>Reported found on:</strong> {{ item["created_at"][:10] if item["created_at"] else "N/A" }}
+              {% endif %}
             </li>
+            {% if item["claimed_at"] %}
+            <li class="list-group-item">
+              <strong>Claimed on:</strong> {{ item["claimed_at"][:10] }}
+            </li>
+            {% endif %}
           </ul>
 
           <ul class="list-group list-group-flush mb-4">
@@ -79,29 +90,40 @@
               <strong>Additional Details:</strong> {{ report["additional_details"] or "N/A" }}
             </li>
             <li class="list-group-item">
-              <strong>Report Created:</strong> {{ report["created_at"] }}
+              <strong>Report Created:</strong> {{ report["created_at"][:16] if report["created_at"] else "N/A" }}
             </li>
+            {% if not report["is_anonymous"] and report["contact_info"] %}
+            <li class="list-group-item">
+              <strong>Contact Info:</strong> {{ report["contact_info"] }}
+            </li>
+            {% endif %}
           </ul>
 
           <!-- Claim logic -->
-          {% if item["status"] == 'lost' %}
+          {% if item["status"]|lower == 'lost' %}
             <div class="alert alert-warning">
-              This item is marked as <strong>lost</strong>. If you believe you found it, request admin review.
+              This item is marked as <strong>lost</strong>. If you believe you found it, contact the reporter.
             </div>
           {% endif %}
 
-          {% if item["status"] == 'found' %}
-            <div class="alert alert-warning">
+          {% if item["status"]|lower == 'found' %}
+            <div class="alert alert-info">
               This item is marked as <strong>found</strong>. If you believe it is yours, request a claim.
             </div>
           {% endif %}
 
-          {% if item["status"] != 'claimed' %}
-            <button id="claim-btn" class="btn btn-success w-100 mb-2">
-                Request to Claim this Item
+          {% if item["status"]|lower != 'claimed' and item["status"]|lower != 'returned' %}
+            <button id="claim-btn" class="btn btn-success w-100 mb-2" onclick="claimItem({{ item['id'] }})">
+              Request to Claim this Item
             </button>
           {% else %}
-            <div class="alert alert-success">Already claimed.</div>
+            <div class="alert alert-success">
+              {% if item["status"]|lower == 'claimed' %}
+                Claimed by: {{ item["claimed_by_name"] or "Someone" }}
+              {% else %}
+                This item has been returned to its owner.
+              {% endif %}
+            </div>
           {% endif %}
 
           <a href="{{ url_for('lost_and_found.lost_and_found_page') }}"
@@ -113,9 +135,6 @@
     </div>
   </div>
 </div>
-
-
-
 {% endblock %}
 
 {% block scripts %}
@@ -133,16 +152,18 @@ async function claimItem(itemId) {
         });
 
         const data = await res.json();
-        if (!res.ok) throw new Error(data.message || res.statusText);
+        if (!res.ok) throw new Error(data.error || data.message || res.statusText);
 
-        alert(data.message || "Claim request sent.");
+        alert(data.message || "Claim request sent successfully!");
         const btn = document.getElementById('claim-btn');
         if (btn) {
             btn.disabled = true;
-            btn.innerText = "Claim requested";
+            btn.innerText = "Claim Requested - Pending Approval";
+            btn.classList.remove('btn-success');
+            btn.classList.add('btn-secondary');
         }
     } catch (err) {
-        console.error(err);
+        console.error('Claim error:', err);
         alert("Failed to create claim request: " + (err.message || err));
     }
 }

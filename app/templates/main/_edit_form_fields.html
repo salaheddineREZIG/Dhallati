@@ -1,0 +1,141 @@
+{{ form.hidden_tag() }}
+
+<!-- Display form errors -->
+{% if form.errors %}
+<div class="alert alert-danger">
+    <ul class="mb-0">
+    {% for field, errors in form.errors.items() %}
+        {% for error in errors %}
+            <li>{{ error }}</li>
+        {% endfor %}
+    {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<!-- Report Type -->
+<div class="mb-3">
+    <label class="form-label">Report Type</label>
+    <div>
+        {% for subfield in form.report_type %}
+            <div class="form-check form-check-inline">
+                {{ subfield(class="form-check-input") }}
+                {{ subfield.label(class="form-check-label") }}
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Anonymous Switch -->
+<div class="form-check form-switch mb-3">
+    {{ form.is_anonymous(class="form-check-input") }}
+    {{ form.is_anonymous.label(class="form-check-label") }}
+</div>
+
+<!-- Item Name -->
+<div class="mb-3">
+    {{ form.name.label(class="form-label") }}
+    {{ form.name(class="form-control") }}
+    {% if form.name.errors %}
+        <div class="text-danger small">
+            {% for error in form.name.errors %}
+                {{ error }}
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<!-- Description -->
+<div class="mb-3">
+    {{ form.description.label(class="form-label") }}
+    {{ form.description(class="form-control", rows="3") }}
+</div>
+
+<!-- Category -->
+<div class="mb-3">
+    {{ form.category.label(class="form-label") }}
+    {{ form.category(class="form-select") }}
+    {% if form.category.errors %}
+        <div class="text-danger small">
+            {% for error in form.category.errors %}
+                {{ error }}
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<!-- Location Reported -->
+<div class="mb-3">
+    {{ form.location_reported.label(class="form-label") }}
+    {{ form.location_reported(class="form-control") }}
+</div>
+
+<!-- Event DateTime -->
+<div class="mb-3">
+    {{ form.event_datetime.label(class="form-label") }}
+    <input type="datetime-local" class="form-control" 
+        id="{{ form.event_datetime.id }}" 
+        name="{{ form.event_datetime.name }}" 
+        value="{{ form.event_datetime.data.strftime('%Y-%m-%dT%H:%M') if form.event_datetime.data else '' }}">
+</div>
+
+<!-- Existing Images -->
+<div class="mb-3">
+    <label class="form-label">Current Images</label>
+    <div class="existing-images">
+        {% if report and report.item.images %}
+            {% for image in report.item.images %}
+                <div class="existing-image d-inline-block me-2 mb-2 text-center">
+                    {% set url = image.image_url|replace('app\\','')|replace('\\','/') %}
+                    <img src="{{ url if url.startswith('/') else '/' ~ url }}" alt="Current image" 
+                         style="width: 100px; height: 100px; object-fit: cover;" 
+                         class="rounded border">
+                    <div class="form-check mt-1">
+                        <input class="form-check-input" type="checkbox" 
+                               name="remove_images" value="{{ image.id }}" 
+                               id="remove-image-{{ image.id }}">
+                        <label class="form-check-label small" for="remove-image-{{ image.id }}">
+                            Remove
+                        </label>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-muted">No images uploaded</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- New Images -->
+<div class="mb-3">
+    {{ form.images.label(class="form-label") }}
+    {{ form.images(class="form-control") }}
+    <div class="form-text">Select new images to add to existing ones</div>
+    {% if form.images.errors %}
+        <div class="text-danger small">
+            {% for error in form.images.errors %}
+                {{ error }}
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<!-- Additional Details -->
+<div class="mb-3">
+    {{ form.additional_details.label(class="form-label") }}
+    {{ form.additional_details(class="form-control", rows="3") }}
+</div>
+
+<!-- Contact Info -->
+<div class="mb-3">
+    {{ form.contact_info.label(class="form-label") }}
+    {{ form.contact_info(class="form-control") }}
+    {% if form.contact_info.errors %}
+        <div class="text-danger small">
+            {% for error in form.contact_info.errors %}
+                {{ error }}
+            {% endfor %}
+        </div>
+    {% endif %}
+    <div class="form-text">10-digit phone number starting with 0</div>
+</div>
