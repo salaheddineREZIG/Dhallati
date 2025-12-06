@@ -22,7 +22,7 @@ def login():
             if form.validate_on_submit():
                 if request.cookies.get('id_token'):
                     flash("Already logged in", "info")
-                    return redirect(url_for("main.home"))
+                    return redirect(url_for("lost_and_found.lost_and_found_page"))
                 try:
                     google = oauth.create_client('google')
                     redirect_uri = url_for('auth.callback', _external=True)
@@ -40,7 +40,7 @@ def login():
         # POST branch: start OAuth flow (same as your prior code)
         if request.cookies.get('id_token'):
             flash("Already logged in", "info")
-            return redirect(url_for("main.home"))
+            return redirect(url_for("lost_and_found.lost_and_found_page"))
 
         try:
             google = oauth.create_client('google')
@@ -132,7 +132,7 @@ def callback():
 
         # Process User info and create a response
         try:
-            response = make_response(redirect(url_for("main.home")))
+            response = make_response(redirect(url_for("lost_and_found.lost_and_found_page")))
             # set cookie (httponly+secure may break local dev on http, but preserving your settings)
             response.set_cookie("id_token", id_token, httponly=True, secure=True, samesite="Lax")
             flash("Logged in successfully", "success")

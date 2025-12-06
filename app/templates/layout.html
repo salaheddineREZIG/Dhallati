@@ -35,6 +35,7 @@
     {% endif %}
 {% endwith %}
 
+{% block navbar %}{% endblock %}
         <div class="container-fluid">
             <div class="row justify-content-center text-center">
                 <div class="col-md-12">
@@ -44,7 +45,6 @@
                 </div>
             </div>
         </div>
-        {% block navbar %}{% endblock %}
     </header>
     
     <main>
@@ -56,5 +56,6 @@
     <script src="{{url_for('static', filename='js/functions.js')}}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     {% block scripts %}{% endblock %}
+    {% block floating_buttons %}{% endblock %}
 </body>
 </html>

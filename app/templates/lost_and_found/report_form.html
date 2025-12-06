@@ -6,7 +6,7 @@
 <style>
 /* Simple, clean design */
 body {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
     min-height: 100vh;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
@@ -37,7 +37,7 @@ body {
 /* Typewriter effect for headers */
 .typewriter {
     overflow: hidden;
-    border-right: 2px solid #667eea;
+    border-right: 2px solid #3b82f6;
     white-space: nowrap;
     margin: 0 auto;
     animation: typing 1.5s steps(40, end), blink-caret 0.75s step-end infinite;
@@ -50,12 +50,12 @@ body {
 
 @keyframes blink-caret {
     from, to { border-color: transparent }
-    50% { border-color: #667eea; }
+    50% { border-color: #3b82f6; }
 }
 
 /* Progress bar animation */
 .progress-bar {
-    background: linear-gradient(90deg, #667eea, #764ba2);
+    background: linear-gradient(90deg, #3b82f6, #2563eb);
     transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
@@ -86,7 +86,7 @@ body {
 }
 
 .card-header {
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
     color: white;
     border-radius: 12px 12px 0 0 !important;
     border: none;
@@ -101,8 +101,8 @@ body {
 }
 
 .form-control:focus, .form-select:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.1);
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.1);
 }
 
 /* Error states */
@@ -145,14 +145,14 @@ body {
 }
 
 .report-type-label:hover {
-    border-color: #667eea;
+    border-color: #3b82f6;
     transform: translateY(-2px);
 }
 
 .report-type-option input[type="radio"]:checked + .report-type-label {
-    border-color: #667eea;
-    background: rgba(102, 126, 234, 0.1);
-    color: #667eea;
+    border-color: #3b82f6;
+    background: rgba(59, 130, 246, 0.1);
+    color: #2563eb;
 }
 
 /* Error state for report type */
@@ -187,13 +187,13 @@ body {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
     border: none;
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
 }
 
 .btn-success {
@@ -217,8 +217,8 @@ body {
 }
 
 .file-upload-area:hover {
-    border-color: #667eea;
-    background: #f8f9ff;
+    border-color: #3b82f6;
+    background: #f0f7ff;
 }
 
 .file-upload-area.is-invalid {
@@ -252,6 +252,115 @@ body {
     background: linear-gradient(135deg, #f8d7da, #f5c6cb);
     color: #721c24;
     margin-bottom: 20px;
+}
+
+/* Custom datetime-local styling */
+.datetime-input-group {
+    position: relative;
+}
+
+.datetime-input-group .form-control[type="datetime-local"] {
+    padding-right: 45px;
+    cursor: pointer;
+}
+
+.datetime-input-group .datetime-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #3b82f6;
+    pointer-events: none;
+}
+
+.datetime-input-group .form-control[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    background: transparent;
+    bottom: 0;
+    color: transparent;
+    cursor: pointer;
+    height: auto;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: auto;
+    opacity: 0;
+}
+
+.datetime-input-group .form-control[type="datetime-local"]:focus {
+    background-color: #f0f7ff;
+}
+
+/* Date/time picker customization */
+input[type="datetime-local"] {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%233b82f6' viewBox='0 0 16 16'%3E%3Cpath d='M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857V3.857z'/%3E%3Cpath d='M6.5 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 16px;
+}
+
+/* Clear button for datetime input */
+.datetime-clear-btn {
+    position: absolute;
+    right: 40px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #6c757d;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+    display: none;
+}
+
+.datetime-clear-btn:hover {
+    background-color: #f1f3f4;
+    color: #dc3545;
+}
+
+.datetime-input-group:hover .datetime-clear-btn {
+    display: block;
+}
+
+/* Timezone indicator */
+.timezone-indicator {
+    font-size: 0.75rem;
+    color: #6c757d;
+    margin-top: 2px;
+    margin-left: 5px;
+}
+
+/* Light blue backgrounds for focus states */
+.form-control:focus, .form-select:focus {
+    background-color: #f8fafc;
+}
+
+/* Review summary box */
+.alert-light {
+    background-color: #f0f7ff;
+    border-left: 4px solid #3b82f6;
+}
+
+/* Blue theme adjustments */
+.btn-outline-primary {
+    color: #3b82f6;
+    border-color: #3b82f6;
+}
+
+.btn-outline-primary:hover {
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+}
+
+/* Text colors for blue theme */
+.text-primary {
+    color: #2563eb !important;
+}
+
+.text-muted {
+    color: #6b7280 !important;
 }
 </style>
 {% endblock %}
@@ -492,12 +601,35 @@ body {
                             <!-- Event Date & Time -->
                             <div class="mb-3">
                                 <label for="event_datetime" class="form-label fw-bold">When did this happen?</label>
-                                {% if form.event_datetime.errors %}
-                                    {{ form.event_datetime(class="form-control is-invalid") }}
-                                {% else %}
-                                    {{ form.event_datetime(class="form-control") }}
-                                {% endif %}
-                                <div class="form-text">Leave empty for current date/time</div>
+                                <div class="datetime-input-group">
+                                    {% if form.event_datetime.errors %}
+                                        <input type="datetime-local" 
+                                               class="form-control is-invalid" 
+                                               id="event_datetime" 
+                                               name="event_datetime"
+                                               step="60">
+                                    {% else %}
+                                        <input type="datetime-local" 
+                                               class="form-control" 
+                                               id="event_datetime" 
+                                               name="event_datetime"
+                                               step="60"
+                                               {% if form.event_datetime.data %}value="{{ form.event_datetime.data.strftime('%Y-%m-%dT%H:%M') }}"{% endif %}>
+                                    {% endif %}
+                                    <span class="datetime-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                            <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857V3.857z"/>
+                                            <path d="M6.5 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                                        </svg>
+                                    </span>
+                                    <button type="button" class="datetime-clear-btn" id="clear-datetime" title="Clear date/time">
+                                        ×
+                                    </button>
+                                </div>
+                                <div class="form-text d-flex justify-content-between">
+                                    <span>Leave empty for current date/time</span>
+                                    <span class="timezone-indicator">Timezone: Local</span>
+                                </div>
                                 {% if form.event_datetime.errors %}
                                 <div class="invalid-feedback">
                                     {% for error in form.event_datetime.errors %}
@@ -561,6 +693,7 @@ body {
                                     <div><strong>Category:</strong> <span id="review-category">Not set</span></div>
                                     <div><strong>Item:</strong> <span id="review-item-name">Not set</span></div>
                                     <div><strong>Location:</strong> <span id="review-location">Not specified</span></div>
+                                    <div><strong>Date & Time:</strong> <span id="review-datetime">Not specified</span></div>
                                 </div>
                             </div>
                         </div>
@@ -743,6 +876,65 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
+    // DateTime functions
+    function formatDateTimeForInput(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
+    
+    function formatDateTimeForDisplay(dateTimeString) {
+        if (!dateTimeString) return 'Not specified';
+        const date = new Date(dateTimeString);
+        return date.toLocaleString('en-US', {
+            weekday: 'short',
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+    
+    // Initialize datetime picker
+    function initDateTimePicker() {
+        const eventDatetimeInput = document.getElementById('event_datetime');
+        const clearDatetimeBtn = document.getElementById('clear-datetime');
+        
+        // Set current datetime as default if empty
+        if (!eventDatetimeInput.value) {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            eventDatetimeInput.value = formatDateTimeForInput(now);
+        }
+        
+        // Set min and max constraints (within last 7 days, not in future)
+        const now = new Date();
+        const sevenDaysAgo = new Date(now);
+        sevenDaysAgo.setDate(now.getDate() - 7);
+        
+        eventDatetimeInput.min = formatDateTimeForInput(sevenDaysAgo);
+        eventDatetimeInput.max = formatDateTimeForInput(now);
+        
+        // Clear button functionality
+        clearDatetimeBtn.addEventListener('click', function() {
+            eventDatetimeInput.value = '';
+            updateReviewSummary();
+        });
+        
+        // Show/hide clear button based on input value
+        eventDatetimeInput.addEventListener('input', function() {
+            clearDatetimeBtn.style.display = this.value ? 'block' : 'none';
+            updateReviewSummary();
+        });
+        
+        // Initialize clear button visibility
+        clearDatetimeBtn.style.display = eventDatetimeInput.value ? 'block' : 'none';
+    }
+    
     // Review summary
     function updateReviewSummary() {
         if (currentStep === 4) {
@@ -751,6 +943,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const itemName = document.getElementById('name');
             const location = document.getElementById('location_id');
             const specificSpot = document.getElementById('specific_spot');
+            const eventDatetime = document.getElementById('event_datetime');
             
             document.getElementById('review-type').textContent = 
                 reportType ? (reportType.value === 'lost' ? 'Lost Item' : 'Found Item') : 'Not set';
@@ -766,6 +959,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 locationText += ` (${specificSpot.value})`;
             }
             document.getElementById('review-location').textContent = locationText;
+            
+            document.getElementById('review-datetime').textContent = 
+                formatDateTimeForDisplay(eventDatetime.value);
         }
     }
     
@@ -774,11 +970,8 @@ document.addEventListener('DOMContentLoaded', function() {
         radio.addEventListener('change', toggleVerificationQuestion);
     });
     
-    // Set current datetime as default
-    const now = new Date();
-    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-    document.getElementById('event_datetime').value = now.toISOString().slice(0, 16);
-    
+    // Initialize datetime picker
+    initDateTimePicker();
     showStep(1);
 });
 </script>

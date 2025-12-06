@@ -85,7 +85,7 @@ class ReportItemForm(FlaskForm):
         'When did this happen?',
         format='%Y-%m-%dT%H:%M',  # Fixed format to match HTML datetime-local
         validators=[Optional()],
-        description="Leave empty for current date/time"
+        description="Select date and time"
     )
     
     # Step 4: Contact & Verification

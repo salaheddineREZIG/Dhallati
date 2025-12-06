@@ -1,15 +1,13 @@
 from flask import render_template, flash, redirect, url_for, current_app
 from app.decorators import login_required
 from . import main
-from app.lost_and_found.models import Report, Item, Category
+from app.lost_and_found.models import Report, Item, Category, Location, VerificationQuestion
 from app.lost_and_found.forms import ReportItemForm
+from flask import request, jsonify, make_response
 @main.route('/') 
 def index(): 
     return render_template('index.html') 
-@main.route('/home') 
-@login_required 
-def home(user): 
-    return render_template('home.html', user=user)
+
 
 @main.route('/profile')
 @login_required
@@ -52,12 +50,6 @@ def profile(user):
     form = ReportItemForm()
     form.category_id.choices = [(category.id, category.name) for category in Category.query.all()]
     return render_template('profile.html', user=user, stats=stats, form=form)
-
-from flask import jsonify, request, current_app, make_response
-from . import main
-from app.decorators import login_required
-from app.lost_and_found.models import Report, Item
-# ... other imports already in file ...
 
 @main.route('/profile/reports', methods=['GET'])
 @login_required
@@ -122,39 +114,47 @@ def profile_reports(user):
 
 @main.route('/profile/get_edit_form/<int:report_id>')
 @login_required
-def get_edit_form(user,report_id):
+def get_edit_form(user, report_id):
     """Return pre-populated edit form for a specific report"""
     try:
-        # Get the report with related item data
-        
         report = Report.query.filter_by(id=report_id).first()
         
         if not report:
             return "Report not found", 404
-        if(report.reporter_id != user['id']):
+        if report.reporter_id != user['id']:
             return "Unauthorized", 403
         
+        # Get verification question if exists
+        vq = VerificationQuestion.query.filter_by(report_id=report.id).first()
+        
+        # Use category_id instead of category
         form = ReportItemForm(
-            report_type=report.report_type.value if report.report_type else 'found',
+            report_type=report.report_type,
+            is_anonymous=report.is_anonymous,
+            category_id=report.item.category_id,  # Changed from category to category_id
             name=report.item.name,
             description=report.item.description,
-            category=report.item.category_id,
-            location_reported=report.location_reported,
-            event_datetime=report.item.created_at,  # Using item creation time as event time
-            is_anonymous=report.is_anonymous,
             additional_details=report.additional_details,
-            contact_info=report.contact_info
+            location_id=report.location_id,
+            specific_spot=report.specific_spot,
+            event_datetime=report.event_datetime,
+            contact_info=report.contact_info,
+            verification_question=vq.question if vq else ''
         )
         
-        # Populate category choices
+        # Populate category choices - use category_id field
         categories = Category.query.all()
-        form.category.choices = [(c.id, c.name) for c in categories]
+        form.category_id.choices = [(c.id, c.name) for c in categories]
+        
+        # Populate location choices
+        locations = Location.query.all()
+        form.location_id.choices = [(l.id, l.name) for l in locations]
         
         return render_template('main/_edit_form_fields.html', 
                              form=form, 
                              report=report)
                              
     except Exception as e:
-        print(f"Error loading edit form: {e}")
+        current_app.logger.error(f"Error loading edit form: {e}")
         return "Error loading form", 500
 

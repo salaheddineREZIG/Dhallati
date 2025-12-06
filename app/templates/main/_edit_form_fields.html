@@ -53,22 +53,35 @@
 
 <!-- Category -->
 <div class="mb-3">
-    {{ form.category.label(class="form-label") }}
-    {{ form.category(class="form-select") }}
-    {% if form.category.errors %}
+    {{ form.category_id.label(class="form-label") }}
+    {{ form.category_id(class="form-select") }}
+    {% if form.category_id.errors %}
         <div class="text-danger small">
-            {% for error in form.category.errors %}
+            {% for error in form.category_id.errors %}
                 {{ error }}
             {% endfor %}
         </div>
     {% endif %}
 </div>
 
-<!-- Location Reported -->
 <div class="mb-3">
-    {{ form.location_reported.label(class="form-label") }}
-    {{ form.location_reported(class="form-control") }}
+    <label class="form-label">Location</label>
+    {{ form.location_id(class="form-select") }}
 </div>
+
+<div class="mb-3">
+    <label class="form-label">Specific Spot</label>
+    {{ form.specific_spot(class="form-control") }}
+</div>
+
+<!-- Verification Question (only for found reports) -->
+{% if report.report_type == 'found' %}
+<div class="mb-3">
+    {{ form.verification_question.label(class="form-label") }}
+    {{ form.verification_question(class="form-control", rows="3") }}
+    <div class="form-text">Question to help verify the real owner</div>
+</div>
+{% endif %}
 
 <!-- Event DateTime -->
 <div class="mb-3">
