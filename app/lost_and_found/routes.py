@@ -17,7 +17,19 @@ import os
 from werkzeug.utils import secure_filename
 import uuid
 from sqlalchemy import or_, cast, Date, and_, func
+from sqlalchemy.orm import joinedload
 
+def format_date(date_str):
+    """Format date string to readable format"""
+    try:
+        if isinstance(date_str, str):
+            date_obj = datetime.fromisoformat(date_str.replace('Z', '+00:00'))
+        else:
+            date_obj = date_str
+        
+        return date_obj.strftime("%B %d, %Y at %I:%M %p")
+    except:
+        return date_str
 
 @lost_and_found.route('/lost_and_found')
 @login_required
@@ -369,9 +381,7 @@ def report_item(user):
                     item_dict['contact_info'] = None
                     item_dict['claimed_by_name'] = None
                 serialized_items.append(item_dict)
-                
-            current_app.logger.debug(f"Serialized items: {serialized_items}")
-            
+                            
             # Build response
             response = {
                 'items': serialized_items,
@@ -730,6 +740,11 @@ def update_report(user):
                 db.session.add(vq)
         elif form.report_type.data == 'found' and not form.verification_question.data:
             VerificationQuestion.query.filter_by(report_id=report.id).delete()
+            
+        elif form.report_type.data == 'lost' and report.report_type == 'found':
+            # If changing from found to lost, remove verification question
+            VerificationQuestion.query.filter_by(report_id=report.id).delete()
+            
         
         # ✅ Update timestamps
         report.updated_at = datetime.now()
@@ -775,33 +790,101 @@ def item(user):
         item_id = request.args.get('id')
         if not item_id:
             flash("Item ID is required", "danger")
-            return redirect(url_for('main.home'))
+            return redirect(url_for('lost_and_found.lost_and_found_page'))
         
-        item = Item.query.filter_by(id=item_id).first()
+        # Validate item_id is a number
+        try:
+            item_id = int(item_id)
+        except ValueError:
+            flash("Invalid item ID", "danger")
+            return redirect(url_for('lost_and_found.lost_and_found_page'))
+        
+        # Get item with eager loading for better performance
+        item = Item.query.options(
+            joinedload(Item.category),
+            joinedload(Item.reporter),
+            joinedload(Item.claimed_by),
+            joinedload(Item.images)
+        ).filter_by(id=item_id).first()
+        
         if not item:
             flash("Item not found", "danger")
-            return redirect(url_for('main.home'))
+            return redirect(url_for('lost_and_found.lost_and_found_page'))
         
-        report = Report.query.filter_by(item_id=item_id).first()
+        # Get report with related data
+        report = Report.query.options(
+            joinedload(Report.location),
+            joinedload(Report.verification_questions)
+        ).filter_by(item_id=item_id).first()
+        
         if not report:
             flash("Report not found for this item", "danger")
-            return redirect(url_for('main.home'))
+            return redirect(url_for('lost_and_found.lost_and_found_page'))
         
-        # Convert to dict with public=False since user is logged in
+        # Convert to dictionaries
         item_dict = item.to_dict()
         report_dict = report.to_dict()
         
+        # Add location details
+        if report.location:
+            report_dict['location_name'] = report.location.name
+            item_dict['location_name'] = report.location.name
         
-        if report.is_anonymous :
-            report_dict['reporter_name'] = None
-            report_dict['contact_info'] = None
-            item_dict['reporter_name'] = None
-            item_dict['claimed_by_name'] = None
+        # Handle anonymous reports
+        if report.is_anonymous:
+            report_dict['reporter_name'] = "Anonymous User"
+            report_dict['contact_info'] = "Contact via platform"
+            item_dict['reporter_name'] = "Anonymous User"
+            item_dict['claimed_by_name'] = None if item_dict['claimed_by_name'] == "Anonymous User" else item_dict['claimed_by_name']
         
-
-        return render_template('item_detail.html', item=item_dict, report=report_dict)
+        # Get verification questions for found items
+        verification_questions = []
+        if report.report_type == 'found' and report.verification_questions:
+            for vq in report.verification_questions:
+                verification_questions.append(vq.question)
+        
+        # Check if current user can claim this item
+        can_claim = False
+        claim_message = ""
+        
+        if item.status.lower() == 'found':
+            # User cannot claim their own found item
+            if report.reporter_id != user['id']:
+                can_claim = True
+                claim_message = "Request to Claim this Item"
+            else:
+                claim_message = "You reported this found item"
+        elif item.status.lower() == 'lost':
+            # For lost items, users can contact the reporter
+            can_claim = True
+            claim_message = "Contact Reporter"
+        elif item.status.lower() == 'claimed':
+            claim_message = f"Claimed by {item_dict.get('claimed_by_name', 'someone')}"
+        elif item.status.lower() == 'returned':
+            claim_message = "Item has been returned to owner"
+        
+        # Format dates nicely
+        if item_dict.get('created_at'):
+            item_dict['formatted_date'] = format_date(item_dict['created_at'])
+        if report_dict.get('created_at'):
+            report_dict['formatted_date'] = format_date(report_dict['created_at'])
+        if item_dict.get('claimed_at'):
+            item_dict['formatted_claimed_date'] = format_date(item_dict['claimed_at'])
+        
+        return render_template(
+            'item_detail.html', 
+            item=item_dict, 
+            report=report_dict,
+            verification_questions=verification_questions,
+            can_claim=can_claim,
+            claim_message=claim_message,
+            current_user_id=user['id'],
+            reporter_id=report.reporter_id
+        )
 
     except Exception as e:
-        current_app.logger.exception("Failed to render item detail for id=%s", request.args.get('id'))
-        flash(f"An error occurred: {str(e)}", "danger")
-        return redirect(url_for('main.home'))
+        current_app.logger.exception(f"Failed to render item detail for id={request.args.get('id')}")
+        flash(f"An error occurred while loading the item details", "danger")
+        return redirect(url_for('lost_and_found.lost_and_found_page'))
+
+# Add this helper function near the top of your file

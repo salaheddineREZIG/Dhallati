@@ -61,6 +61,38 @@ body {
     overflow: hidden;
 }
 
+/* Navigation button improvements */
+#cancel-btn:hover {
+    background-color: #f8f9fa;
+    border-color: #6c757d;
+}
+
+.navigation-buttons .btn {
+    padding: 10px 20px;
+    font-weight: 500;
+}
+
+/* Step indicator */
+.step-indicator {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.step-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #dee2e6;
+    transition: all 0.3s ease;
+}
+
+.step-dot.active {
+    background-color: #3b82f6;
+    transform: scale(1.2);
+}
+
 .progress-bar::after {
     content: '';
     position: absolute;
@@ -702,18 +734,25 @@ input[type="datetime-local"] {
 
                 <!-- Navigation Buttons - Always Visible -->
                 <div class="navigation-buttons">
-                    <div class="d-flex justify-content-between">
-                        <button type="button" class="btn btn-secondary" id="prev-btn" style="display: none;">
-                            ← Previous
-                        </button>
-                        <button type="button" class="btn btn-primary ms-auto" id="next-btn">
-                            Continue →
-                        </button>
-                        <button type="submit" class="btn btn-success ms-auto" id="submit-btn" style="display: none;">
-                            Submit Report
-                        </button>
-                    </div>
-                </div>
+    <div class="d-flex justify-content-between">
+        <div>
+            <button type="button" class="btn btn-link text-muted me-3" id="cancel-btn">
+                Cancel
+            </button>
+            <button type="button" class="btn btn-secondary" id="prev-btn" style="display: none;">
+                ← Previous
+            </button>
+        </div>
+        <div>
+            <button type="button" class="btn btn-primary" id="next-btn">
+                Continue →
+            </button>
+            <button type="submit" class="btn btn-success" id="submit-btn" style="display: none;">
+                Submit Report
+            </button>
+        </div>
+    </div>
+</div>
             </form>
         </div>
     </div>
@@ -775,6 +814,46 @@ document.addEventListener('DOMContentLoaded', function() {
             errorElement.style.display = 'block';
         }
     }
+
+    // Cancel button functionality
+document.getElementById('cancel-btn').addEventListener('click', function() {
+    if (formChanged) {
+        const confirmCancel = confirm('You have unsaved changes. Are you sure you want to cancel?');
+        if (confirmCancel) {
+            window.location.href = "{{ url_for('lost_and_found.lost_and_found_page') }}";
+        }
+    } else {
+        window.location.href = "{{ url_for('lost_and_found.lost_and_found_page') }}";
+    }
+});
+
+// Track form changes
+let formChanged = false;
+
+// Detect changes in form inputs
+const formInputs = document.querySelectorAll('#reportForm input, #reportForm textarea, #reportForm select');
+formInputs.forEach(input => {
+    input.addEventListener('input', function() {
+        formChanged = true;
+    });
+    input.addEventListener('change', function() {
+        formChanged = true;
+    });
+});
+
+// Reset formChanged on submit
+document.getElementById('reportForm').addEventListener('submit', function() {
+    formChanged = false;
+});
+
+// Warn user if they try to leave the page with unsaved changes
+window.addEventListener('beforeunload', function(e) {
+    if (formChanged) {
+        e.preventDefault();
+        e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+        return 'You have unsaved changes. Are you sure you want to leave?';
+    }
+});
     
     // Validation
     function validateStep(step) {

@@ -15,6 +15,34 @@
 </style>
 {% endblock %}
 
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+    <div class="container">
+        <!-- Brand/App Name on the left -->
+        <a class="navbar-brand fw-bold text-primary" href="{{ url_for('lost_and_found.lost_and_found_page') }}">
+            Lost & Found
+        </a>
+        
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <!-- Logout Button -->
+                <li class="nav-item">
+                    <form action="{{ url_for('auth.logout') }}" method="GET">
+                        <button type="submit" class="btn btn-outline-danger">
+                            <i class="bi bi-box-arrow-right me-1"></i>Logout
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
 {% block main %}
 <div class="container py-5">
   <div class="row justify-content-center">
@@ -160,7 +188,7 @@
 {% block scripts %}
 <script>
 (function () {
-  const PAGE_SIZE = 6; // change as you like
+  const PAGE_SIZE = 4; // change as you like
   const state = { page: 0, loading: false, finished: false };
 
   function escapeHtml(str) {

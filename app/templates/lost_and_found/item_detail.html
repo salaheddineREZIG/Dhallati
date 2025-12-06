@@ -2,170 +2,504 @@
 
 {% block title %}Item Details - {{ item["name"] }}{% endblock %}
 
+{% block extras %}
+<style>
+    .item-image {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+    }
+    
+    .item-image:hover {
+        transform: scale(1.02);
+    }
+    
+    .thumbnail {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 6px;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+    
+    .thumbnail:hover {
+        border-color: #3b82f6;
+        transform: translateY(-2px);
+    }
+    
+    .thumbnail.active {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+    }
+    
+    .info-card {
+        border-left: 4px solid #3b82f6;
+        background: #f8fafc;
+    }
+    
+    .status-badge {
+        font-size: 0.9rem;
+        padding: 0.35rem 0.75rem;
+    }
+    
+    .detail-label {
+        font-weight: 600;
+        color: #4b5563;
+        min-width: 140px;
+    }
+    
+    .detail-value {
+        color: #1f2937;
+    }
+    
+    .contact-card {
+        background: linear-gradient(135deg, #f0f7ff, #e1effe);
+        border: 1px solid #dbeafe;
+    }
+    
+    .image-modal .modal-dialog {
+        max-width: 90%;
+        max-height: 90vh;
+    }
+    
+    .image-modal img {
+        max-height: 80vh;
+        object-fit: contain;
+    }
+</style>
+{% endblock %}
+
+{% block navbar  %}
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-primary" href="{{ url_for('lost_and_found.lost_and_found_page') }}">
+            Lost & Found
+        </a>
+        
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item me-3">
+                    <a class="nav-link" href="{{ url_for('main.profile') }}">
+                        <i class="bi bi-person-circle me-1"></i>Profile
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <form action="{{ url_for('auth.logout') }}" method="GET">
+                        <button type="submit" class="btn btn-outline-danger">
+                            <i class="bi bi-box-arrow-right me-1"></i>Logout
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
 {% block main %}
-<div class="container py-5">
+<div class="container py-4">
+    <div class="row g-4">
+        <!-- Left Column: Images -->
+        <div class="col-lg-6">
+                        <div class="row g-2 mb-4">
+                <div class="col-4">
+                    <div class="card text-center py-3 info-card">
+                        <div class="card-body p-2">
+                            <div class="text-muted small">Status</div>
+                            <div class="fw-bold">
+                                <span class="badge bg-primary status-badge">{{ item["status"]|capitalize }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="card text-center py-3 info-card">
+                        <div class="card-body p-2">
+                            <div class="text-muted small">Category</div>
+                            <div class="fw-bold">{{ item["category_name"] or "Uncategorized" }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="card text-center py-3 info-card">
+                        <div class="card-body p-2">
+                            <div class="text-muted small">Type</div>
+                            <div class="fw-bold">{{ report["report_type"]|capitalize }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Main Image -->
+            <div class="card shadow-sm mb-3">
+                <div class="card-body p-0">
+                    {% if item["images"] and item["images"]|length > 0 %}
+                        {% set url = item['images'][0]['image_url']|replace('app\\','')|replace('\\','/') %}
+                        <img src="{{ url if url.startswith('/') else '/' ~ url }}" 
+                             class="item-image" 
+                             alt="{{ item['name'] }}"
+                             data-bs-toggle="modal" 
+                             data-bs-target="#imageModal"
+                             onclick="showImageModal('{{ url if url.startswith('/') else '/' ~ url }}')">
+                    {% else %}
+                        <img src="{{ url_for('static', filename='images/default.png') }}"
+                             class="item-image"
+                             alt="No image available"
+                             data-bs-toggle="modal" 
+                             data-bs-target="#imageModal"
+                             onclick="showImageModal('{{ url_for('static', filename='images/default.png') }}')">
+                    {% endif %}
+                </div>
+            </div>
 
-  <!-- Title -->
-  <div class="text-center mb-4">
-    <h1 class="display-5 fw-bold">{{ item["name"] }}</h1>
-    <p class="text-muted mb-0">
-      Category: {{ item["category_name"] or "Uncategorized" }}
-      • Status: <span class="badge bg-primary">{{ item["status"]|capitalize }}</span>
-    </p>
-  </div>
-
-  <div class="row g-4">
-    <!-- Left Column: Images -->
-    <div class="col-lg-6 col-md-12">
-      {% if item["images"] and item["images"]|length > 0 %}
-        <!-- Main Image -->
-        <div class="card shadow-sm mb-3">
-          {% set url = item['images'][0]['image_url']|replace('app\\','')|replace('\\','/') %}
-
-          {# Clean the path - remove app\\ prefixes and fix slashes #}
-          <img src="{{ url if url.startswith('/') else '/' ~ url }}"
-               class="card-img-top img-fluid rounded"
-               alt="{{ item['name'] }}"
-               style="max-height: 400px; object-fit: cover;"
-               id="main-image">
+            <!-- Thumbnails -->
+           <!-- Thumbnails -->
+{% if item["images"] and item["images"]|length > 1 %}
+<div class="d-flex flex-wrap gap-2 mb-4" id="thumbnail-container">
+    {% for image in item["images"] %}
+        {% set thumb_url = image['image_url']|replace('app\\','')|replace('\\','/') %}
+        <img src="{{ thumb_url if thumb_url.startswith('/') else '/' ~ thumb_url }}"
+             class="thumbnail {% if loop.first %}active{% endif %}"
+             alt="{{ item['name'] }} thumbnail {{ loop.index }}"
+             data-index="{{ loop.index0 }}"
+             onclick="changeMainImage('{{ thumb_url if thumb_url.startswith('/') else '/' ~ thumb_url }}', this, {{ loop.index0 }})">
+    {% endfor %}
+</div>
+{% endif %}
         </div>
 
-        <!-- Thumbnails -->
-        {% if item["images"]|length > 1 %}
-        <div class="d-flex flex-wrap gap-2">
-          {% for image in item["images"][1:] %}
-          {% set url = image['image_url']|replace('app\\','')|replace('\\','/') %}
-            <img src="{{ url if url.startswith('/') else '/' ~ url }}"
-                 class="img-thumbnail"
-                 style="width:100px; height:100px; object-fit:cover; cursor: pointer;"
-                 alt="{{ item['name'] }} thumbnail"
-                 onclick="document.getElementById('main-image').src = this.src">
-          {% endfor %}
+        <!-- Right Column: Details -->
+        <div class="col-lg-6">
+            <!-- Item Header -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 class="card-title mb-2">{{ item["name"] }}</h2>
+                    <p class="card-text text-muted mb-3">
+                        <i class="bi bi-calendar me-1"></i>
+                        {{ item.get("formatted_date", item["created_at"][:10] if item["created_at"] else "Unknown date") }}
+                    </p>
+                    <p class="card-text">{{ item["description"] or "No description provided." }}</p>
+                </div>
+            </div>
+
+            <!-- Item Details -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">Item Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-2">
+                        <div class="col-sm-4 detail-label">Reported by:</div>
+                        <div class="col-sm-8 detail-value">
+                            {{ item["reporter_name"] or "Anonymous" }}
+                            {% if report["is_anonymous"] %}
+                                <span class="badge bg-secondary ms-2">Anonymous</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    {% if report.get("location_name") %}
+                    <div class="row mb-2">
+                        <div class="col-sm-4 detail-label">Location:</div>
+                        <div class="col-sm-8 detail-value">
+                            {{ report["location_name"] }}
+                            {% if report["specific_spot"] %}
+                                <div class="text-muted small">({{ report["specific_spot"] }})</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if report["additional_details"] %}
+                    <div class="row mb-2">
+                        <div class="col-sm-4 detail-label">Additional Info:</div>
+                        <div class="col-sm-8 detail-value">{{ report["additional_details"] }}</div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if verification_questions %}
+                    <div class="row mb-2">
+                        <div class="col-sm-4 detail-label">Verification:</div>
+                        <div class="col-sm-8 detail-value">
+                            {% for question in verification_questions %}
+                                <div class="alert alert-info py-2 mb-2">
+                                    <strong>Q:</strong> {{ question }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if item["claimed_at"] %}
+                    <div class="row mb-2">
+                        <div class="col-sm-4 detail-label">Claimed on:</div>
+                        <div class="col-sm-8 detail-value">
+                            {{ item.get("formatted_claimed_date", item["claimed_at"][:10]) }}
+                            {% if item["claimed_by_name"] %}
+                                by {{ item["claimed_by_name"] }}
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Contact & Actions -->
+            <div class="card shadow-sm contact-card">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">Contact & Actions</h5>
+                </div>
+                <div class="card-body">
+                    {% if not report["is_anonymous"] and report["contact_info"] %}
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <div class="alert alert-success py-2">
+                                <i class="bi bi-telephone me-2"></i>
+                                <strong>Contact:</strong> {{ report["contact_info"] }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if item["status"]|lower == 'lost' %}
+                        <div class="alert alert-warning mb-3">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            This item is marked as <strong>lost</strong>. If you found it, please contact the reporter.
+                        </div>
+                    {% elif item["status"]|lower == 'found' %}
+                        <div class="alert alert-info mb-3">
+                            <i class="bi bi-info-circle me-2"></i>
+                            This item is marked as <strong>found</strong>. If you believe it's yours, request a claim.
+                        </div>
+                    {% elif item["status"]|lower == 'claimed' %}
+                        <div class="alert alert-success mb-3">
+                            <i class="bi bi-check-circle me-2"></i>
+                            This item has been <strong>claimed</strong>.
+                        </div>
+                    {% elif item["status"]|lower == 'returned' %}
+                        <div class="alert alert-success mb-3">
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                            This item has been <strong>returned</strong> to its owner.
+                        </div>
+                    {% endif %}
+
+                    <!-- Action Buttons -->
+                    <div class="d-grid gap-2">
+                        {% if can_claim %}
+                            <button id="claim-btn" class="btn btn-success" onclick="handleItemAction()">
+                                <i class="bi bi-hand-thumbs-up me-2"></i>
+                                {{ claim_message }}
+                            </button>
+                        {% else %}
+                            <button class="btn btn-secondary" disabled>
+                                <i class="bi bi-info-circle me-2"></i>
+                                {{ claim_message }}
+                            </button>
+                        {% endif %}
+                        
+                        <a href="{{ url_for('lost_and_found.lost_and_found_page') }}" 
+                           class="btn btn-outline-primary">
+                            <i class="bi bi-arrow-left me-2"></i>
+                            Back to Lost & Found
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
-        {% endif %}
-      {% else %}
-        <div class="card shadow-sm mb-3">
-          <img src="{{ url_for('static', filename='images/default.png') }}"
-               class="card-img-top img-fluid rounded"
-               alt="No image available"
-               style="max-height: 400px; object-fit: cover;"
-               id="main-image">
-        </div>
-      {% endif %}
     </div>
+</div>
 
-    <!-- Right Column: Details -->
-    <div class="col-lg-6 col-md-12">
-      <div class="card shadow-sm h-100">
-        <div class="card-body">
-          <h4 class="card-title mb-3">Item Information</h4>
-          <p class="card-text">{{ item["description"] or "No description provided." }}</p>
-
-          <ul class="list-group list-group-flush mb-4">
-            <li class="list-group-item">
-              <strong>Reported by:</strong> {{ item["reporter_name"] or "Anonymous" }}
-            </li>
-            <li class="list-group-item">
-              {% if item["status"]|lower == 'lost' %}
-                <strong>Reported lost on:</strong> {{ item["created_at"][:10] if item["created_at"] else "N/A" }}
-              {% else %}
-                <strong>Reported found on:</strong> {{ item["created_at"][:10] if item["created_at"] else "N/A" }}
-              {% endif %}
-            </li>
-            {% if item["claimed_at"] %}
-            <li class="list-group-item">
-              <strong>Claimed on:</strong> {{ item["claimed_at"][:10] }}
-            </li>
-            {% endif %}
-          </ul>
-
-          <ul class="list-group list-group-flush mb-4">
-            <li class="list-group-item">
-              <strong>Report Type:</strong> {{ report["report_type"]|capitalize }}
-            </li>
-            <li class="list-group-item">
-              <strong>Location Reported:</strong> {{ report["location_reported"] or "N/A" }}
-            </li>
-            <li class="list-group-item">
-              <strong>Additional Details:</strong> {{ report["additional_details"] or "N/A" }}
-            </li>
-            <li class="list-group-item">
-              <strong>Report Created:</strong> {{ report["created_at"][:16] if report["created_at"] else "N/A" }}
-            </li>
-            {% if not report["is_anonymous"] and report["contact_info"] %}
-            <li class="list-group-item">
-              <strong>Contact Info:</strong> {{ report["contact_info"] }}
-            </li>
-            {% endif %}
-          </ul>
-
-          <!-- Claim logic -->
-          {% if item["status"]|lower == 'lost' %}
-            <div class="alert alert-warning">
-              This item is marked as <strong>lost</strong>. If you believe you found it, contact the reporter.
+<!-- Image Modal -->
+<div class="modal fade image-modal" id="imageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content bg-transparent border-0">
+            <div class="modal-header border-0">
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-          {% endif %}
-
-          {% if item["status"]|lower == 'found' %}
-            <div class="alert alert-info">
-              This item is marked as <strong>found</strong>. If you believe it is yours, request a claim.
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" class="img-fluid rounded" alt="Enlarged view">
             </div>
-          {% endif %}
-
-          {% if item["status"]|lower != 'claimed' and item["status"]|lower != 'returned' %}
-            <button id="claim-btn" class="btn btn-success w-100 mb-2" onclick="claimItem({{ item['id'] }})">
-              Request to Claim this Item
-            </button>
-          {% else %}
-            <div class="alert alert-success">
-              {% if item["status"]|lower == 'claimed' %}
-                Claimed by: {{ item["claimed_by_name"] or "Someone" }}
-              {% else %}
-                This item has been returned to its owner.
-              {% endif %}
-            </div>
-          {% endif %}
-
-          <a href="{{ url_for('lost_and_found.lost_and_found_page') }}"
-             class="btn btn-outline-secondary w-100">
-            Back to Lost & Found
-          </a>
         </div>
-      </div>
     </div>
-  </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
+// Store current image index
+let currentImageIndex = 0;
+
+// Image handling
+function changeMainImage(src, element, index) {
+    // Update main image
+    const mainImg = document.querySelector('.item-image');
+    if (mainImg) {
+        mainImg.src = src;
+        // Also update the modal onclick to show this image
+        mainImg.setAttribute('onclick', `showImageModal('${src}')`);
+    }
+    
+    // Update active thumbnail
+    document.querySelectorAll('.thumbnail').forEach(thumb => {
+        thumb.classList.remove('active');
+    });
+    element.classList.add('active');
+    
+    // Update current index
+    currentImageIndex = index;
+}
+
+function showImageModal(src) {
+    const modalImage = document.getElementById('modalImage');
+    if (modalImage) {
+        modalImage.src = src;
+    }
+}
+
+// Keyboard navigation for images
+function navigateImages(direction) {
+    const thumbnails = document.querySelectorAll('.thumbnail');
+    if (thumbnails.length === 0) return;
+    
+    let newIndex = currentImageIndex + direction;
+    
+    // Loop around
+    if (newIndex < 0) newIndex = thumbnails.length - 1;
+    if (newIndex >= thumbnails.length) newIndex = 0;
+    
+    // Click the thumbnail at newIndex
+    if (thumbnails[newIndex]) {
+        const src = thumbnails[newIndex].src;
+        changeMainImage(src, thumbnails[newIndex], newIndex);
+    }
+}
+
+// Item action handling
+function handleItemAction() {
+    const itemId = {{ item["id"] }};
+    const status = "{{ item['status']|lower }}";
+    const reporterId = {{ reporter_id }};
+    const currentUserId = {{ current_user_id }};
+    
+    if (status === 'found' && reporterId === currentUserId) {
+        alert("You cannot claim your own found item.");
+        return;
+    }
+    
+    if (status === 'lost') {
+        // For lost items, show contact info or message
+        const contactInfo = "{{ report['contact_info'] if report['contact_info'] else 'Contact information not available' }}";
+        if (contactInfo && contactInfo !== 'Contact information not available') {
+            alert(`Please contact the reporter at: ${contactInfo}`);
+        } else {
+            alert("The reporter has chosen to remain anonymous. Please check back later or report a match.");
+        }
+    } else if (status === 'found') {
+        // For found items, initiate claim process
+        claimItem(itemId);
+    }
+}
+
 async function claimItem(itemId) {
-    const confirmOk = confirm("Request a claim for this item? This will notify the admin and create a pending claim.");
-    if (!confirmOk) return;
-
-    try {
-        const res = await fetch(`/lost_and_found/api/claim/${itemId}`, {
-            method: 'POST',
-            credentials: 'same-origin',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: "I believe this is mine" })
+    // Show verification questions if available
+    const verificationQuestions = {{ verification_questions|tojson|safe }};
+    
+    if (verificationQuestions.length > 0) {
+        let message = "Please answer these verification questions:\n\n";
+        verificationQuestions.forEach((q, i) => {
+            message += `${i + 1}. ${q}\n`;
         });
+        message += "\nYour answers will help verify your ownership.";
+        
+        const userAnswers = prompt(message + "\n\nEnter your answers separated by commas:");
+        if (!userAnswers) return;
+        
+        // Process claim with answers
+        await submitClaim(itemId, userAnswers);
+    } else {
+        const confirmOk = confirm("Are you sure you want to claim this item? This will notify the reporter and create a claim request.");
+        if (!confirmOk) return;
+        
+        await submitClaim(itemId);
+    }
+}
 
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || data.message || res.statusText);
-
-        alert(data.message || "Claim request sent successfully!");
+async function submitClaim(itemId, answers = null) {
+    try {
         const btn = document.getElementById('claim-btn');
         if (btn) {
             btn.disabled = true;
-            btn.innerText = "Claim Requested - Pending Approval";
-            btn.classList.remove('btn-success');
-            btn.classList.add('btn-secondary');
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
         }
-    } catch (err) {
-        console.error('Claim error:', err);
-        alert("Failed to create claim request: " + (err.message || err));
+        
+        const response = await fetch(`/lost_and_found/api/claim/${itemId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            },
+            body: JSON.stringify({ 
+                message: "Claim request",
+                verification_answers: answers
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            alert(data.message || "Claim request submitted successfully!");
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="bi bi-clock me-2"></i>Claim Requested - Pending';
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-secondary');
+            }
+        } else {
+            throw new Error(data.error || data.message || "Claim failed");
+        }
+    } catch (error) {
+        console.error('Claim error:', error);
+        alert("Failed to submit claim: " + error.message);
+        
+        const btn = document.getElementById('claim-btn');
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-hand-thumbs-up me-2"></i>{{ claim_message }}';
+        }
     }
 }
+
+// CSRF token helper
+function getCsrfToken() {
+    const meta = document.querySelector('meta[name="csrf-token"]');
+    return meta ? meta.getAttribute('content') : '';
+}
+
+// Initialize image gallery
+document.addEventListener('DOMContentLoaded', function() {
+    // Close modal on ESC key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const modalElement = document.getElementById('imageModal');
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            if (modal) modal.hide();
+        }
+        
+        // Arrow key navigation for images
+        if (e.key === 'ArrowLeft') {
+            navigateImages(-1);
+        } else if (e.key === 'ArrowRight') {
+            navigateImages(1);
+        }
+    });
+});
 </script>
 {% endblock %}
