@@ -29,6 +29,40 @@
         
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto align-items-center">
+              <!-- In your navbar -->
+<li class="nav-item dropdown">
+    <a class="nav-link position-relative" href="#" id="notificationDropdown" role="button" 
+       data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="bi bi-bell fs-5"></i>
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
+              id="notificationBadge" style="display: none;">
+            0
+        </span>
+    </a>
+    
+    <ul class="dropdown-menu dropdown-menu-end p-0" style="width: 350px; max-height: 400px; overflow-y: auto;">
+        <li class="dropdown-header bg-light d-flex justify-content-between align-items-center">
+            <span class="fw-bold">Notifications</span>
+            <button class="btn btn-sm btn-outline-secondary" id="markAllReadBtn">
+                Mark all read
+            </button>
+        </li>
+        <li><hr class="dropdown-divider m-0"></li>
+        <div id="notificationList">
+            <!-- Dynamic content -->
+            <div class="text-center py-4 text-muted">
+                <i class="bi bi-bell-slash fs-3"></i>
+                <p class="mb-0 mt-2">No notifications</p>
+            </div>
+        </div>
+        <li class="dropdown-footer text-center p-2">
+            <a href="" class="text-decoration-none">
+                View all notifications
+            </a>
+        </li>
+    </ul>
+</li>
+              
                 <!-- Logout Button -->
                 <li class="nav-item">
                     <form action="{{ url_for('auth.logout') }}" method="GET">
@@ -188,7 +222,7 @@
 {% block scripts %}
 <script>
 (function () {
-  const PAGE_SIZE = 4; // change as you like
+  const PAGE_SIZE = 4;
   const state = { page: 0, loading: false, finished: false };
 
   function escapeHtml(str) {
@@ -202,27 +236,26 @@
   }
 
   function renderReportItem(r) {
-  const created = r.created_at || '';
-  const badge = r.status ? `<span class="badge bg-secondary">${escapeHtml(r.status)}</span>` : '';
-  const id = escapeHtml(String(r.id));
-  const itemId = encodeURIComponent(r.item_id || '');
-  const deleteModalId = `deleteReportModal-${id}`;
-  const deleteRoute = `/lost_and_found/api?report_id=${encodeURIComponent(id)}`;
+    const created = r.created_at || '';
+    const id = escapeHtml(String(r.id));
+    const itemId = encodeURIComponent(r.item_id || '');
+    const deleteModalId = `deleteReportModal-${id}`;
+    const deleteRoute = `/lost_and_found/api?report_id=${encodeURIComponent(id)}`;
+    const location = r.location_reported || '—';
 
-  return `
+    return `
     <div class="report-item mb-3" id="report-${id}">
       <a href="/lost_and_found/item?id=${itemId}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-start">
         <div>
           <div class="fw-bold">${escapeHtml(r.item_name || 'Unnamed')}</div>
-          <div class="small-muted">${escapeHtml(r.location_reported || '—')} • ${escapeHtml((r.report_type || '').charAt(0).toUpperCase() + (r.report_type || '').slice(1))} • ${escapeHtml(created)}</div>
+          <div class="small-muted">${escapeHtml(location)} • ${escapeHtml((r.report_type || '').charAt(0).toUpperCase() + (r.report_type || '').slice(1))} • ${escapeHtml(created)}</div>
         </div>
         <div class="text-end">
-          ${badge}
+          ${r.status ? `<span class="badge bg-secondary">${escapeHtml(r.status)}</span>` : ''}
         </div>
       </a>
 
       <div class="d-flex justify-content-end p-2 gap-2">
-        <!-- Simplified Edit button using shared modal -->
         <button type="button" class="btn btn-outline-primary edit-report-btn" 
                 data-report-id="${id}" data-bs-toggle="modal" data-bs-target="#editReportModal">
           Edit
@@ -238,7 +271,6 @@
         </button>
       </div>
 
-      <!-- DELETE MODAL (keep existing) -->
       <div class="modal fade" id="${deleteModalId}" tabindex="-1" aria-labelledby="${deleteModalId}Label" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
@@ -265,54 +297,45 @@
       </div>
     </div>
   `;
-}
-
-// Simple edit form handling
-document.addEventListener('click', function(e) {
-  if (e.target.classList.contains('edit-report-btn')) {
-    const reportId = e.target.getAttribute('data-report-id');
-    loadEditForm(reportId);
   }
-});
 
-async function loadEditForm(reportId) {
-  try {
-    // Set the report ID in the form
-    document.getElementById('edit-report-id').value = reportId;
-    
-    // Update modal title
-    document.getElementById('editReportModalLabel').textContent = `Edit Report #${reportId}`;
-    
-    // Load the form content from server
-    const response = await fetch(`/profile/get_edit_form/${reportId}`);
-    if (!response.ok) throw new Error('Failed to load form');
-    
-    const formHtml = await response.text();
-    document.getElementById('edit-form-container').innerHTML = formHtml;
-    
-  } catch (error) {
-    console.error('Error loading edit form:', error);
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('edit-report-btn')) {
+      const reportId = e.target.getAttribute('data-report-id');
+      loadEditForm(reportId);
+    }
+  });
+
+  async function loadEditForm(reportId) {
+    try {
+      document.getElementById('edit-report-id').value = reportId;
+      document.getElementById('editReportModalLabel').textContent = `Edit Report #${reportId}`;
+      
+      const response = await fetch(`/profile/get_edit_form/${reportId}`);
+      if (!response.ok) throw new Error('Failed to load form');
+      
+      const formHtml = await response.text();
+      document.getElementById('edit-form-container').innerHTML = formHtml;
+      
+    } catch (error) {
+      console.error('Error loading edit form:', error);
+      document.getElementById('edit-form-container').innerHTML = 
+        '<div class="alert alert-danger">Error loading form. Please try again.</div>';
+    }
+  }
+
+  document.getElementById('editReportModal').addEventListener('hidden.bs.modal', function() {
     document.getElementById('edit-form-container').innerHTML = 
-      '<div class="alert alert-danger">Error loading form. Please try again.</div>';
-  }
-}
+      '<div class="text-center py-4"><div class="spinner-border" role="status"></div></div>';
+  });
 
-// Clear form when modal is hidden
-document.getElementById('editReportModal').addEventListener('hidden.bs.modal', function() {
-  document.getElementById('edit-form-container').innerHTML = 
-    '<div class="text-center py-4"><div class="spinner-border" role="status"></div></div>';
-});
-
-  // helper to get CSRF token from meta tag or cookie (if you use one)
   function getCsrfToken() {
     const meta = document.querySelector('meta[name="csrf-token"]');
     if (meta) return meta.getAttribute('content');
-    // fallback: cookie named csrf_token
     const m = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]+)/);
     return m ? decodeURIComponent(m[1]) : null;
   }
 
-  // delegate click handler for delete confirmation
   document.addEventListener('click', function (e) {
     const btn = e.target.closest && e.target.closest('.confirm-delete-btn');
     if (!btn) return;
@@ -325,7 +348,6 @@ document.getElementById('editReportModal').addEventListener('hidden.bs.modal', f
       return;
     }
 
-    // Perform DELETE via fetch
     (async function () {
       try {
         const headers = { 'Accept': 'application/json' };
@@ -342,7 +364,6 @@ document.getElementById('editReportModal').addEventListener('hidden.bs.modal', f
           return;
         }
 
-        // success
         const root = document.getElementById(`report-${reportId}`);
         if (root) root.remove();
 
@@ -354,7 +375,6 @@ document.getElementById('editReportModal').addEventListener('hidden.bs.modal', f
     })();
   });
 
-  // small helper to show an inline flash (uses #profile-flash)
   function showFlash(message, level) {
     const flash = document.getElementById('profile-flash');
     if (!flash) {
@@ -373,20 +393,6 @@ document.getElementById('editReportModal').addEventListener('hidden.bs.modal', f
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>`;
   }
-
-
-document.addEventListener('click', function (e) {
-  const btn = e.target.closest && e.target.closest('.confirm-delete-btn');
-  if (!btn) return;
-  const route = btn.getAttribute('data-route') || '';
-  const reportId = btn.getAttribute('data-report-id');
-
-  if (!route) {
-    console.warn(`Delete route is empty for report ${reportId}. Fill the data-route attribute to enable deletion.`);
-    return;
-  }
-
-});
 
   async function loadReports() {
     if (state.loading || state.finished) return;
@@ -410,7 +416,6 @@ document.addEventListener('click', function (e) {
       const container = document.getElementById('reports-list');
 
       if (state.page === 1 && items.length === 0) {
-        // no reports at all
         if (empty) empty.style.display = 'block';
         if (btn) btn.style.display = 'none';
       } else {
@@ -424,7 +429,6 @@ document.addEventListener('click', function (e) {
         container.appendChild(frag);
       }
 
-      // decide finished
       if (data.has_more === false) {
         state.finished = true;
       } else if (typeof data.total === 'number') {
@@ -439,7 +443,6 @@ document.addEventListener('click', function (e) {
 
     } catch (err) {
       console.error('Failed to load reports:', err);
-      // Optionally show user-facing toast/flash here
     } finally {
       state.loading = false;
       if (btn) btn.disabled = false;
@@ -447,12 +450,9 @@ document.addEventListener('click', function (e) {
     }
   }
 
-  // wire up
   document.addEventListener('DOMContentLoaded', function() {
     const btn = document.getElementById('reports-load-more');
     if (btn) btn.addEventListener('click', loadReports);
-
-    // optionally load first page automatically
     loadReports();
   });
 

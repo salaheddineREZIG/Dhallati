@@ -416,7 +416,7 @@ input[type="datetime-local"] {
                 <ul class="mb-0 mt-2">
                     {% for field, errors in form.errors.items() %}
                         {% for error in errors %}
-                            <li>{{ error }}</li>
+                            <li>{{ field }}: {{ error }}</li>
                         {% endfor %}
                     {% endfor %}
                 </ul>
@@ -440,7 +440,7 @@ input[type="datetime-local"] {
             <!-- Multi-Step Form -->
             <form id="reportForm" method="POST" action="{{ url_for('lost_and_found.report_item') }}" 
                 enctype="multipart/form-data" novalidate>
-                {{ form.csrf_token }} 
+                {{ form.csrf_token }}
                   
                 <!-- Step 1: Basics -->
                 <div class="step step-1 active">
@@ -477,14 +477,21 @@ input[type="datetime-local"] {
                                 {% endif %}
                             </div>
 
-                            <!-- Anonymous -->
-                            <div class="mb-4">
+                            <!-- Anonymous - NOTE: Will be hidden for lost items via JavaScript -->
+                            <div class="mb-4" id="anonymous-section">
                                 <div class="form-check form-switch">
                                     {{ form.is_anonymous(class="form-check-input") }}
                                     <label class="form-check-label" for="is_anonymous">
-                                        Post anonymously?
+                                        Post anonymously? (Your contact info will still be available to the other party)
                                     </label>
                                 </div>
+                                {% if form.is_anonymous.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.is_anonymous.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
                             </div>
 
                             <!-- Category -->
@@ -589,90 +596,82 @@ input[type="datetime-local"] {
                 </div>
 
                 <!-- Step 3: Location & Time -->
-                <div class="step step-3">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="card-title mb-0">Where and when did this happen?</h5>
-                        </div>
-                        <div class="card-body">
-                            <!-- Location -->
-                            <div class="mb-3">
-                                <label for="location_id" class="form-label fw-bold">Location</label>
-                                {% if form.location_id.errors %}
-                                    {{ form.location_id(class="form-select is-invalid") }}
-                                {% else %}
-                                    {{ form.location_id(class="form-select") }}
-                                {% endif %}
-                                {% if form.location_id.errors %}
-                                <div class="invalid-feedback">
-                                    {% for error in form.location_id.errors %}
-                                    {{ error }}
-                                    {% endfor %}
-                                </div>
-                                {% endif %}
-                            </div>
-
-                            <!-- Specific Spot -->
-                            <div class="mb-3">
-                                <label for="specific_spot" class="form-label">Specific Spot</label>
-                                {% if form.specific_spot.errors %}
-                                    {{ form.specific_spot(class="form-control is-invalid", value=form.specific_spot.data or '') }}
-                                {% else %}
-                                    {{ form.specific_spot(class="form-control", value=form.specific_spot.data or '') }}
-                                {% endif %}
-                                <div class="form-text">e.g., 2nd floor study room</div>
-                                {% if form.specific_spot.errors %}
-                                <div class="invalid-feedback">
-                                    {% for error in form.specific_spot.errors %}
-                                    {{ error }}
-                                    {% endfor %}
-                                </div>
-                                {% endif %}
-                            </div>
-
-                            <!-- Event Date & Time -->
-                            <div class="mb-3">
-                                <label for="event_datetime" class="form-label fw-bold">When did this happen?</label>
-                                <div class="datetime-input-group">
-                                    {% if form.event_datetime.errors %}
-                                        <input type="datetime-local" 
-                                               class="form-control is-invalid" 
-                                               id="event_datetime" 
-                                               name="event_datetime"
-                                               step="60">
-                                    {% else %}
-                                        <input type="datetime-local" 
-                                               class="form-control" 
-                                               id="event_datetime" 
-                                               name="event_datetime"
-                                               step="60"
-                                               {% if form.event_datetime.data %}value="{{ form.event_datetime.data.strftime('%Y-%m-%dT%H:%M') }}"{% endif %}>
-                                    {% endif %}
-                                    <span class="datetime-icon">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                            <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857V3.857z"/>
-                                            <path d="M6.5 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
-                                        </svg>
-                                    </span>
-                                    <button type="button" class="datetime-clear-btn" id="clear-datetime" title="Clear date/time">
-                                        ×
-                                    </button>
-                                </div>
-                                <div class="form-text d-flex justify-content-between">
-                                    <span>Leave empty for current date/time</span>
-                                    <span class="timezone-indicator">Timezone: Local</span>
-                                </div>
-                                {% if form.event_datetime.errors %}
-                                <div class="invalid-feedback">
-                                    {% for error in form.event_datetime.errors %}
-                                    {{ error }}
-                                    {% endfor %}
-                                </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
+<div class="step step-3">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Where and when did this happen?</h5>
+        </div>
+        <div class="card-body">
+            <!-- Location -->
+            <div class="mb-3">
+                <label for="location_id" class="form-label fw-bold">Location</label>
+                {% if form.location_id.errors %}
+                    {{ form.location_id(class="form-select is-invalid") }}
+                {% else %}
+                    {{ form.location_id(class="form-select") }}
+                {% endif %}
+                {% if form.location_id.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.location_id.errors %}
+                    {{ error }}
+                    {% endfor %}
                 </div>
+                {% endif %}
+            </div>
+
+            <!-- Specific Spot -->
+            <div class="mb-3">
+                <label for="specific_spot" class="form-label">Specific Spot</label>
+                {% if form.specific_spot.errors %}
+                    {{ form.specific_spot(class="form-control is-invalid", value=form.specific_spot.data or '') }}
+                {% else %}
+                    {{ form.specific_spot(class="form-control", value=form.specific_spot.data or '') }}
+                {% endif %}
+                <div class="form-text">e.g., 2nd floor study room</div>
+                {% if form.specific_spot.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.specific_spot.errors %}
+                    {{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Event Date & Time - FIXED -->
+            <div class="mb-3">
+                <label for="event_datetime" class="form-label fw-bold">When did this happen?</label>
+                <div class="datetime-input-group">
+                    <input type="datetime-local" 
+                           class="form-control {% if form.event_datetime.errors %}is-invalid{% endif %}" 
+                           id="event_datetime" 
+                           name="event_datetime"
+                           step="60"
+                           value="{% if form.event_datetime.data %}{{ form.event_datetime.data.strftime('%Y-%m-%dT%H:%M') }}{% endif %}">
+                    <span class="datetime-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857V3.857z"/>
+                            <path d="M6.5 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                        </svg>
+                    </span>
+                    <button type="button" class="datetime-clear-btn" id="clear-datetime" title="Clear date/time">
+                        ×
+                    </button>
+                </div>
+                <div class="form-text d-flex justify-content-between">
+                    <span>Optional - Leave empty for current date/time</span>
+                    <span class="timezone-indicator">Timezone: Local</span>
+                </div>
+                {% if form.event_datetime.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.event_datetime.errors %}
+                    {{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
 
                 <!-- Step 4: Contact -->
                 <div class="step step-4">
@@ -683,13 +682,13 @@ input[type="datetime-local"] {
                         <div class="card-body">
                             <!-- Contact Info -->
                             <div class="mb-3">
-                                <label for="contact_info" class="form-label fw-bold required-field">Contact Phone</label>
+                                <label for="contact_info" class="form-label fw-bold required-field">Contact Phone Number</label>
                                 {% if form.contact_info.errors %}
                                     {{ form.contact_info(class="form-control is-invalid", value=form.contact_info.data or '') }}
                                 {% else %}
                                     {{ form.contact_info(class="form-control", value=form.contact_info.data or '') }}
                                 {% endif %}
-                                <div class="form-text">10-digit number starting with 0</div>
+                                <div class="form-text">10-digit number starting with 0 (e.g., 0698166666)</div>
                                 {% if form.contact_info.errors %}
                                 <div class="invalid-feedback">
                                     {% for error in form.contact_info.errors %}
@@ -699,15 +698,15 @@ input[type="datetime-local"] {
                                 {% endif %}
                             </div>
 
-                            <!-- Verification Question -->
-                            <div class="mb-3" id="verification-question-section" style="display: none;">
-                                <label for="verification_question" class="form-label fw-bold">Verification Question</label>
+                            <!-- Verification Question - Only for found items -->
+                            <div class="mb-3" id="verification-question-section">
+                                <label for="verification_question" class="form-label">Verification Question (For Found Items Only)</label>
                                 {% if form.verification_question.errors %}
                                     {{ form.verification_question(class="form-control is-invalid", rows="3") }}
                                 {% else %}
                                     {{ form.verification_question(class="form-control", rows="3") }}
                                 {% endif %}
-                                <div class="form-text">Required for found items - helps verify the real owner</div>
+                                <div class="form-text">Optional: Question to help verify the real owner (e.g., "What color is the inside lining?")</div>
                                 {% if form.verification_question.errors %}
                                 <div class="invalid-feedback">
                                     {% for error in form.verification_question.errors %}
@@ -726,6 +725,7 @@ input[type="datetime-local"] {
                                     <div><strong>Item:</strong> <span id="review-item-name">Not set</span></div>
                                     <div><strong>Location:</strong> <span id="review-location">Not specified</span></div>
                                     <div><strong>Date & Time:</strong> <span id="review-datetime">Not specified</span></div>
+                                    <div><strong>Anonymous:</strong> <span id="review-anonymous">No</span></div>
                                 </div>
                             </div>
                         </div>
@@ -734,25 +734,25 @@ input[type="datetime-local"] {
 
                 <!-- Navigation Buttons - Always Visible -->
                 <div class="navigation-buttons">
-    <div class="d-flex justify-content-between">
-        <div>
-            <button type="button" class="btn btn-link text-muted me-3" id="cancel-btn">
-                Cancel
-            </button>
-            <button type="button" class="btn btn-secondary" id="prev-btn" style="display: none;">
-                ← Previous
-            </button>
-        </div>
-        <div>
-            <button type="button" class="btn btn-primary" id="next-btn">
-                Continue →
-            </button>
-            <button type="submit" class="btn btn-success" id="submit-btn" style="display: none;">
-                Submit Report
-            </button>
-        </div>
-    </div>
-</div>
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <button type="button" class="btn btn-link text-muted me-3" id="cancel-btn">
+                                Cancel
+                            </button>
+                            <button type="button" class="btn btn-secondary" id="prev-btn" style="display: none;">
+                                ← Previous
+                            </button>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-primary" id="next-btn">
+                                Continue →
+                            </button>
+                            <button type="submit" class="btn btn-success" id="submit-btn" style="display: none;">
+                                Submit Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </form>
         </div>
     </div>
@@ -765,6 +765,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentStep = 1;
     const totalSteps = 4;
     const progressBar = document.getElementById('progress-bar');
+    let formChanged = false;
     
     // Show/hide steps
     function showStep(step) {
@@ -777,10 +778,38 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('submit-btn').style.display = step === totalSteps ? 'block' : 'none';
         
         // Update progress
-        const progress = ((currentStep - 1) / (totalSteps - 1)) * 100;
+        const progress = ((step - 1) / (totalSteps - 1)) * 100;
         progressBar.style.width = progress + '%';
         
-        updateReviewSummary();
+        // Update review summary when on last step
+        if (step === totalSteps) {
+            updateReviewSummary();
+        }
+    }
+    
+    // Update UI based on report type
+    function updateFormUI() {
+        const reportType = document.querySelector('input[name="report_type"]:checked');
+        const anonymousSection = document.getElementById('anonymous-section');
+        const verificationSection = document.getElementById('verification-question-section');
+        
+        if (reportType && reportType.value === 'lost') {
+            // Hide anonymous checkbox for lost reports
+            anonymousSection.style.display = 'none';
+            // Uncheck anonymous if it was checked
+            document.getElementById('is_anonymous').checked = false;
+            // Update verification question label
+            document.querySelector('label[for="verification_question"]').textContent = 
+                'Verification Question (For Found Items Only)';
+            verificationSection.style.display = 'block'; // Still show but with note
+        } else if (reportType && reportType.value === 'found') {
+            // Show anonymous checkbox for found reports
+            anonymousSection.style.display = 'block';
+            // Update verification question label
+            document.querySelector('label[for="verification_question"]').textContent = 
+                'Verification Question (Optional)';
+            verificationSection.style.display = 'block';
+        }
     }
     
     // Clear validation errors for a step
@@ -816,44 +845,41 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Cancel button functionality
-document.getElementById('cancel-btn').addEventListener('click', function() {
-    if (formChanged) {
-        const confirmCancel = confirm('You have unsaved changes. Are you sure you want to cancel?');
-        if (confirmCancel) {
+    document.getElementById('cancel-btn').addEventListener('click', function() {
+        if (formChanged) {
+            const confirmCancel = confirm('You have unsaved changes. Are you sure you want to cancel?');
+            if (confirmCancel) {
+                window.location.href = "{{ url_for('lost_and_found.lost_and_found_page') }}";
+            }
+        } else {
             window.location.href = "{{ url_for('lost_and_found.lost_and_found_page') }}";
         }
-    } else {
-        window.location.href = "{{ url_for('lost_and_found.lost_and_found_page') }}";
-    }
-});
-
-// Track form changes
-let formChanged = false;
-
-// Detect changes in form inputs
-const formInputs = document.querySelectorAll('#reportForm input, #reportForm textarea, #reportForm select');
-formInputs.forEach(input => {
-    input.addEventListener('input', function() {
-        formChanged = true;
     });
-    input.addEventListener('change', function() {
-        formChanged = true;
+    
+    // Track form changes
+    const formInputs = document.querySelectorAll('#reportForm input, #reportForm textarea, #reportForm select');
+    formInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            formChanged = true;
+        });
+        input.addEventListener('change', function() {
+            formChanged = true;
+        });
     });
-});
-
-// Reset formChanged on submit
-document.getElementById('reportForm').addEventListener('submit', function() {
-    formChanged = false;
-});
-
-// Warn user if they try to leave the page with unsaved changes
-window.addEventListener('beforeunload', function(e) {
-    if (formChanged) {
-        e.preventDefault();
-        e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
-        return 'You have unsaved changes. Are you sure you want to leave?';
-    }
-});
+    
+    // Reset formChanged on submit
+    document.getElementById('reportForm').addEventListener('submit', function() {
+        formChanged = false;
+    });
+    
+    // Warn user if they try to leave the page with unsaved changes
+    window.addEventListener('beforeunload', function(e) {
+        if (formChanged) {
+            e.preventDefault();
+            e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+            return 'You have unsaved changes. Are you sure you want to leave?';
+        }
+    });
     
     // Validation
     function validateStep(step) {
@@ -880,25 +906,40 @@ window.addEventListener('beforeunload', function(e) {
                 if (!itemName.value.trim()) {
                     showFieldError(itemName, 'Please enter an item name');
                     isValid = false;
+                } else if (itemName.value.length > 150) {
+                    showFieldError(itemName, 'Item name must be less than 150 characters');
+                    isValid = false;
                 }
                 break;
+
+            case 3:
+    const eventDatetimeInput = document.getElementById('event_datetime');
+    if (eventDatetimeInput.value) {
+        const selectedDate = new Date(eventDatetimeInput.value);
+        const now = new Date();
+        const sevenDaysAgo = new Date(now);
+        sevenDaysAgo.setDate(now.getDate() - 7);
+        
+        if (selectedDate > now) {
+            showFieldError(eventDatetimeInput, 'Date cannot be in the future');
+            isValid = false;
+        } else if (selectedDate < sevenDaysAgo) {
+            showFieldError(eventDatetimeInput, 'Date must be within the last 7 days');
+            isValid = false;
+        }
+    }
+    break;
                 
             case 4:
                 const contactInfo = document.getElementById('contact_info');
                 const phoneRegex = /^0\d{9}$/;
-                if (!phoneRegex.test(contactInfo.value)) {
+                
+                if (!contactInfo.value.trim()) {
+                    showFieldError(contactInfo, 'Contact phone number is required');
+                    isValid = false;
+                } else if (!phoneRegex.test(contactInfo.value)) {
                     showFieldError(contactInfo, 'Please enter a valid 10-digit phone number starting with 0');
                     isValid = false;
-                }
-                
-                // Validate verification question for found items
-                const reportTypeCheck = document.querySelector('input[name="report_type"]:checked');
-                if (reportTypeCheck && reportTypeCheck.value === 'found') {
-                    const verificationQuestion = document.getElementById('verification_question');
-                    if (!verificationQuestion.value.trim()) {
-                        showFieldError(verificationQuestion, 'Please provide a verification question for found items');
-                        isValid = false;
-                    }
                 }
                 break;
         }
@@ -919,18 +960,6 @@ window.addEventListener('beforeunload', function(e) {
         showStep(currentStep);
     });
     
-    // Toggle verification question
-    function toggleVerificationQuestion() {
-        const reportType = document.querySelector('input[name="report_type"]:checked');
-        const verificationSection = document.getElementById('verification-question-section');
-        
-        if (reportType && reportType.value === 'found') {
-            verificationSection.style.display = 'block';
-        } else {
-            verificationSection.style.display = 'none';
-        }
-    }
-    
     // File upload
     const fileUploadArea = document.getElementById('file-upload-area');
     const imagesInput = document.getElementById('images');
@@ -940,6 +969,13 @@ window.addEventListener('beforeunload', function(e) {
     imagesInput.addEventListener('change', function(e) {
         const preview = document.getElementById('image-preview');
         preview.innerHTML = '';
+        
+        // Validate file count
+        if (e.target.files.length > 5) {
+            showFieldError(fileUploadArea, 'You can upload a maximum of 5 images');
+            imagesInput.value = '';
+            return;
+        }
         
         for (let file of e.target.files) {
             if (file.type.startsWith('image/')) {
@@ -955,102 +991,119 @@ window.addEventListener('beforeunload', function(e) {
         }
     });
     
-    // DateTime functions
-    function formatDateTimeForInput(date) {
+    
+    // Initialize datetime picker
+    
+    function initDateTimePicker() {
+    const eventDatetimeInput = document.getElementById('event_datetime');
+    const clearDatetimeBtn = document.getElementById('clear-datetime');
+    
+    // Only set default if empty
+    if (!eventDatetimeInput.value) {
+        const now = new Date();
+        // Format to YYYY-MM-DDTHH:MM
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        eventDatetimeInput.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
+    
+    // Set min and max constraints (within last 7 days and not in the future)
+    const now = new Date();
+    const sevenDaysAgo = new Date(now);
+    sevenDaysAgo.setDate(now.getDate() - 7);
+    
+    const formatForInput = (date) => {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
         const hours = String(date.getHours()).padStart(2, '0');
         const minutes = String(date.getMinutes()).padStart(2, '0');
         return `${year}-${month}-${day}T${hours}:${minutes}`;
-    }
+    };
     
-    function formatDateTimeForDisplay(dateTimeString) {
-        if (!dateTimeString) return 'Not specified';
-        const date = new Date(dateTimeString);
-        return date.toLocaleString('en-US', {
-            weekday: 'short',
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    }
+    eventDatetimeInput.min = formatForInput(sevenDaysAgo);
+    eventDatetimeInput.max = formatForInput(now);
     
-    // Initialize datetime picker
-    function initDateTimePicker() {
-        const eventDatetimeInput = document.getElementById('event_datetime');
-        const clearDatetimeBtn = document.getElementById('clear-datetime');
-        
-        // Set current datetime as default if empty
-        if (!eventDatetimeInput.value) {
-            const now = new Date();
-            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-            eventDatetimeInput.value = formatDateTimeForInput(now);
-        }
-        
-        // Set min and max constraints (within last 7 days, not in future)
-        const now = new Date();
-        const sevenDaysAgo = new Date(now);
-        sevenDaysAgo.setDate(now.getDate() - 7);
-        
-        eventDatetimeInput.min = formatDateTimeForInput(sevenDaysAgo);
-        eventDatetimeInput.max = formatDateTimeForInput(now);
-        
-        // Clear button functionality
-        clearDatetimeBtn.addEventListener('click', function() {
-            eventDatetimeInput.value = '';
-            updateReviewSummary();
-        });
-        
-        // Show/hide clear button based on input value
-        eventDatetimeInput.addEventListener('input', function() {
-            clearDatetimeBtn.style.display = this.value ? 'block' : 'none';
-            updateReviewSummary();
-        });
-        
-        // Initialize clear button visibility
+    // Clear button functionality
+    clearDatetimeBtn.addEventListener('click', function() {
+        eventDatetimeInput.value = '';
+        updateReviewSummary();
+        clearDatetimeBtn.style.display = 'none';
+    });
+    
+    // Show/hide clear button based on input value
+    function updateClearButton() {
         clearDatetimeBtn.style.display = eventDatetimeInput.value ? 'block' : 'none';
     }
     
+    eventDatetimeInput.addEventListener('input', function() {
+        updateClearButton();
+        updateReviewSummary();
+    });
+    
+    // Initialize clear button visibility
+    updateClearButton();
+}
+
+// Also update the formatDateTimeForDisplay function:
+function formatDateTimeForDisplay(dateTimeString) {
+    if (!dateTimeString) return 'Not specified';
+    const date = new Date(dateTimeString);
+    return date.toLocaleString('en-US', {
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
     // Review summary
     function updateReviewSummary() {
-        if (currentStep === 4) {
-            const reportType = document.querySelector('input[name="report_type"]:checked');
-            const category = document.getElementById('category_id');
-            const itemName = document.getElementById('name');
-            const location = document.getElementById('location_id');
-            const specificSpot = document.getElementById('specific_spot');
-            const eventDatetime = document.getElementById('event_datetime');
-            
-            document.getElementById('review-type').textContent = 
-                reportType ? (reportType.value === 'lost' ? 'Lost Item' : 'Found Item') : 'Not set';
-            
-            document.getElementById('review-category').textContent = 
-                category.options[category.selectedIndex]?.text || 'Not set';
-            
-            document.getElementById('review-item-name').textContent = 
-                itemName.value || 'Not set';
-            
-            let locationText = location.options[location.selectedIndex]?.text || 'Not specified';
-            if (specificSpot.value) {
-                locationText += ` (${specificSpot.value})`;
-            }
-            document.getElementById('review-location').textContent = locationText;
-            
-            document.getElementById('review-datetime').textContent = 
-                formatDateTimeForDisplay(eventDatetime.value);
+        const reportType = document.querySelector('input[name="report_type"]:checked');
+        const category = document.getElementById('category_id');
+        const itemName = document.getElementById('name');
+        const location = document.getElementById('location_id');
+        const specificSpot = document.getElementById('specific_spot');
+        const eventDatetime = document.getElementById('event_datetime');
+        const isAnonymous = document.getElementById('is_anonymous');
+        
+        document.getElementById('review-type').textContent = 
+            reportType ? (reportType.value === 'lost' ? 'Lost Item' : 'Found Item') : 'Not set';
+        
+        document.getElementById('review-category').textContent = 
+            category.options[category.selectedIndex]?.text || 'Not set';
+        
+        document.getElementById('review-item-name').textContent = 
+            itemName.value || 'Not set';
+        
+        let locationText = location.options[location.selectedIndex]?.text || 'Not specified';
+        if (specificSpot.value) {
+            locationText += ` (${specificSpot.value})`;
         }
+        document.getElementById('review-location').textContent = locationText;
+        
+        document.getElementById('review-datetime').textContent = 
+            formatDateTimeForDisplay(eventDatetime.value);
+            
+        document.getElementById('review-anonymous').textContent = 
+            isAnonymous && isAnonymous.checked ? 'Yes' : 'No';
     }
     
     // Initialize
     document.querySelectorAll('input[name="report_type"]').forEach(radio => {
-        radio.addEventListener('change', toggleVerificationQuestion);
+        radio.addEventListener('change', function() {
+            updateFormUI();
+            updateReviewSummary();
+        });
     });
     
     // Initialize datetime picker
     initDateTimePicker();
+    updateFormUI(); // Set initial UI state
     showStep(1);
 });
 </script>

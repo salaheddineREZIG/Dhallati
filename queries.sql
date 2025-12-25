@@ -39,10 +39,10 @@ SELECT * FROM audit_logs;
 --('Dormitory A', 'North residence hall'),
 --('Dormitory B', 'South residence hall');
 SELECT * FROM items;
-SELECT * FROM categories;
-SELECT * FROM locations;
 SELECT * FROM reports;
 SELECT * FROM item_images;
-SELECT * FROM verification_questions;
+SELECT * FROM notifications;
+SELECT * FROM verification_questions; 
+SELECT * FROM claims
 ------.tables
 ----

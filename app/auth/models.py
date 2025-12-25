@@ -1,8 +1,5 @@
-from datetime import datetime
-import enum
-from sqlalchemy import func, Index, CheckConstraint
+from sqlalchemy import func
 from app import db
-
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -17,36 +14,85 @@ class User(db.Model):
     created_at = db.Column(db.DateTime(timezone=True), server_default=func.now(), nullable=False)
     last_login_at = db.Column(db.DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 
-    # Relationships
-    items_reported = db.relationship('Item', foreign_keys='Item.reporter_id', back_populates='reporter', lazy='select')
-    reports = db.relationship('Report', back_populates='reporter', lazy='select')
-    notifications = db.relationship('Notification', back_populates='user', lazy='select')
-    audit_logs = db.relationship('AuditLog', back_populates='user', lazy='select')
+    # ===== Relationships (UPDATED) =====
+    
+    # Items this user reported as lost
+    items_reported = db.relationship(
+        'Item', 
+        foreign_keys='Item.reporter_id', 
+        back_populates='reporter', 
+        lazy='select',
+        cascade='all, delete-orphan'
+    )
+    
+    # Items this user found
+    items_found = db.relationship(
+        'Item', 
+        foreign_keys='Item.found_by_id', 
+        back_populates='found_by', 
+        lazy='select'
+    )
+    
+    # Items this user claimed
+    items_claimed = db.relationship(
+        'Item', 
+        foreign_keys='Item.claimed_by_id', 
+        back_populates='claimed_by', 
+        lazy='select'
+    )
+    
+    # Reports made by this user
+    reports = db.relationship(
+        'Report', 
+        back_populates='reporter', 
+        lazy='select',
+        cascade='all, delete-orphan'
+    )
+    
+    # Notifications for this user
+    notifications = db.relationship(
+        'Notification', 
+        back_populates='user', 
+        lazy='select',
+        cascade='all, delete-orphan'
+    )
+    
+    # Audit logs for this user
+    audit_logs = db.relationship(
+        'AuditLog', 
+        back_populates='user', 
+        lazy='select',
+        cascade='all, delete-orphan'
+    )
 
+    # ===== Methods =====
+    
     def __repr__(self):
         return f"<User id={self.id} name={self.name!r}>"
 
-    def to_dict(self, public: bool = True):
+    def to_dict(self):
         base = {
             'id': self.id,
             'name': self.name,
             'profile_pic': self.profile_pic,
             'email': self.email,
-            'created_at': self.created_at.strftime('%Y-%m-%d') if self.created_at else None,
-        }
-        if public:
-            return base
-        base.update({
+            'created_at': self.created_at.isoformat() if self.created_at else None,
             'google_id': self.google_id,
             'is_active': self.is_active,
             'last_login_at': self.last_login_at.isoformat() if self.last_login_at else None,
-        })
+            # Stats
+            'items_reported_count': len(self.items_reported) if self.items_reported else 0,
+            'items_found_count': len(self.items_found) if self.items_found else 0,
+            'notifications_count': len(self.notifications) if self.notifications else 0,
+            'pending_claims_count': len([c for c in self.claims_received if c.status == 'pending']) if self.claims_received else 0,
+        }
         return base
+    
 
 
 class AuditLog(db.Model):
     __tablename__ = 'audit_logs'
-
+    
     id = db.Column(db.Integer, primary_key=True)
     table_name = db.Column(db.String(100), nullable=False, index=True)
     record_id = db.Column(db.Integer, nullable=False, index=True)
@@ -65,5 +111,6 @@ class AuditLog(db.Model):
             'action': self.action,
             'performed_by': self.performed_by,
             'performed_at': self.performed_at.isoformat() if self.performed_at else None,
-            'changes': self.changes
+            'changes': self.changes,
+            'performer_name': self.user.name if self.user else 'System'
         }

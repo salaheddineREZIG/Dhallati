@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import (StringField, TextAreaField, SelectField, DateTimeField, 
                     BooleanField, MultipleFileField, RadioField, SubmitField)
-from wtforms.validators import DataRequired, Optional, Length, Regexp
+from wtforms.validators import DataRequired, Optional, Length, Regexp, ValidationError
 from flask_wtf.file import FileAllowed
 from app.constants import NAME_LIMIT, DESCRIPTION_LIMIT
 from flask_wtf.csrf import CSRFProtect
@@ -17,7 +17,7 @@ class ReportItemForm(FlaskForm):
     is_anonymous = BooleanField(
         'Post Anonymously?',
         default=False,
-        description="Hide your name from other users"
+        description="Hide your name from other users (contact info will still be available to the other party)"
     )
     
     category_id = SelectField(
@@ -83,7 +83,7 @@ class ReportItemForm(FlaskForm):
     
     event_datetime = DateTimeField(
         'When did this happen?',
-        format='%Y-%m-%dT%H:%M',  # Fixed format to match HTML datetime-local
+        format='%Y-%m-%dT%H:%M',
         validators=[Optional()],
         description="Select date and time"
     )
@@ -94,13 +94,38 @@ class ReportItemForm(FlaskForm):
         validators=[
             DataRequired(message='Contact number is required'),
             Length(min=10, max=10, message='Phone number must be exactly 10 digits'),
-            Regexp(r'^[0-9]{10}$', message='Enter a valid 10-digit phone number')  # Fixed regex
+            Regexp(r'^[0-9]{10}$', message='Enter a valid 10-digit phone number')
         ],
-        description="10-digit number (e.g., 0698166666)"
+        description="10-digit number (e.g., 0698166666). Required for all reports."
     )
     
     verification_question = TextAreaField(
         'Verification Question',
         validators=[Optional()],
-        description="For Found items: Question to help verify the real owner"
+        description="For Found items only: Question to help verify the real owner (optional)"
     )
+    
+    # Custom validators
+    def validate_is_anonymous(self, field):
+        """Ensure lost reports cannot be anonymous"""
+        if self.report_type.data == 'lost' and field.data:
+            raise ValidationError('Lost reports cannot be anonymous. Your contact info is needed so finders can reach you.')
+    
+    def validate_verification_question(self, field):
+        """Add context to validation message"""
+        if field.data and self.report_type.data == 'lost':
+            # We'll still allow it but warn it won't be used
+            pass  # Just a note, not an error
+    
+    def validate_on_submit(self, extra_validators=None):
+        """Override to handle cross-field validation"""
+        # First run the standard validation
+        if not super().validate_on_submit(extra_validators):
+            return False
+        
+        # Additional cross-field validations
+        if self.report_type.data == 'lost' and self.is_anonymous.data:
+            self.is_anonymous.errors.append('Lost reports cannot be anonymous.')
+            return False
+            
+        return True

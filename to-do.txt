@@ -1,3 +1,11 @@
-add route to see items and reports separatly 
 
-remove is_anonymous from reports model
+claiming logic
+
+notifications 
+landing page.
+
+
+____________________________________
+
+edits
+

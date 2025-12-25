@@ -13,22 +13,26 @@
 </div>
 {% endif %}
 
-<!-- Report Type -->
+<!-- Display current report type as read-only -->
 <div class="mb-3">
     <label class="form-label">Report Type</label>
-    <div>
-        {% for subfield in form.report_type %}
-            <div class="form-check form-check-inline">
-                {{ subfield(class="form-check-input") }}
-                {{ subfield.label(class="form-check-label") }}
-            </div>
-        {% endfor %}
+    <div class="form-control-plaintext">
+        <span class="badge {% if report.report_type == 'lost' %}bg-warning{% else %}bg-success{% endif %}">
+            {{ report.report_type|title }}
+        </span>
+        <input type="hidden" name="report_type" value="{{ report.report_type }}">
     </div>
+    <div class="form-text text-muted">Report type cannot be changed</div>
 </div>
 
-<!-- Anonymous Switch -->
+<!-- Anonymous Switch - Disabled for lost reports -->
 <div class="form-check form-switch mb-3">
-    {{ form.is_anonymous(class="form-check-input") }}
+    {% if report.report_type == 'lost' %}
+        {{ form.is_anonymous(class="form-check-input", disabled=true) }}
+        <div class="form-text text-muted">Anonymous reporting is not available for lost items</div>
+    {% else %}
+        {{ form.is_anonymous(class="form-check-input") }}
+    {% endif %}
     {{ form.is_anonymous.label(class="form-check-label") }}
 </div>
 
@@ -83,18 +87,17 @@
         value="{{ form.event_datetime.data.strftime('%Y-%m-%dT%H:%M') if form.event_datetime.data else '' }}">
 </div>
 
-<!-- Verification Question - ALWAYS SHOWN BUT CONDITIONALLY DISABLED -->
+<!-- Verification Question - Only for found reports -->
 <div class="mb-3" id="verification-question-container">
     {{ form.verification_question.label(class="form-label") }}
-    {{ form.verification_question(class="form-control", rows="3", 
-       placeholder=("Required for found items - helps verify the real owner" if report.report_type == 'found' else "Only for found items")) }}
-    <div class="form-text" id="verification-help-text">
-        {% if report.report_type == 'found' %}
-        Required for found items - helps verify the real owner
-        {% else %}
-        Only for found items - field will be disabled for lost reports
-        {% endif %}
-    </div>
+    {% if report.report_type == 'lost' %}
+        {{ form.verification_question(class="form-control", rows="3", disabled=true, readonly=true) }}
+        <div class="form-text text-muted">Only for found items - field disabled for lost reports</div>
+    {% else %}
+        {{ form.verification_question(class="form-control", rows="3", 
+           placeholder="Required for found items - helps verify the real owner") }}
+        <div class="form-text">Required for found items - helps verify the real owner</div>
+    {% endif %}
     {% if form.verification_question.errors %}
         <div class="text-danger small">
             {% for error in form.verification_question.errors %}
@@ -135,7 +138,7 @@
 <div class="mb-3">
     {{ form.images.label(class="form-label") }}
     {{ form.images(class="form-control") }}
-    <div class="form-text">Select new images to add to existing ones</div>
+    <div class="form-text">Select new images to add to existing ones (max 5 total)</div>
     {% if form.images.errors %}
         <div class="text-danger small">
             {% for error in form.images.errors %}
@@ -167,53 +170,44 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Get DOM elements
-    const reportTypeRadios = document.querySelectorAll('input[name="report_type"]');
-    const verificationQuestion = document.getElementById('{{ form.verification_question.id }}');
-    const verificationContainer = document.getElementById('verification-question-container');
-    const verificationHelpText = document.getElementById('verification-help-text');
+    const anonymousSwitch = document.getElementById('{{ form.is_anonymous.id }}');
+    const contactInfoField = document.getElementById('{{ form.contact_info.id }}');
     
-    // Function to toggle verification question field
-    function toggleVerificationQuestion() {
-        const selectedReportType = document.querySelector('input[name="report_type"]:checked');
-        
-        if (selectedReportType && selectedReportType.value === 'found') {
-            // Enable for found items
-            verificationQuestion.disabled = false;
-            verificationQuestion.placeholder = "Required for found items - helps verify the real owner";
-            verificationQuestion.removeAttribute('readonly');
-            verificationContainer.classList.remove('text-muted');
-            verificationHelpText.textContent = "Required for found items - helps verify the real owner";
-            verificationHelpText.classList.remove('text-muted');
-        } else {
-            // Disable for lost items
-            verificationQuestion.disabled = true;
-            verificationQuestion.value = ''; // Clear the value
-            verificationQuestion.placeholder = "Only for found items - field disabled for lost reports";
-            verificationContainer.classList.add('text-muted');
-            verificationHelpText.textContent = "Only for found items - field disabled for lost reports";
-            verificationHelpText.classList.add('text-muted');
+    // Function to toggle contact info field based on anonymity
+    function toggleContactInfoField() {
+        if (contactInfoField && anonymousSwitch) {
+            if (anonymousSwitch.checked && "{{ report.report_type }}" === 'found') {
+                // For found reports, if anonymous, contact info should be readonly
+                contactInfoField.setAttribute('readonly', true);
+                contactInfoField.style.backgroundColor = '#f8f9fa';
+            } else {
+                // Otherwise, make it editable
+                contactInfoField.removeAttribute('readonly');
+                contactInfoField.style.backgroundColor = '';
+            }
         }
     }
     
-    // Add event listeners to report type radio buttons
-    reportTypeRadios.forEach(radio => {
-        radio.addEventListener('change', toggleVerificationQuestion);
-    });
+    // Add event listener to anonymous switch
+    if (anonymousSwitch) {
+        anonymousSwitch.addEventListener('change', toggleContactInfoField);
+    }
     
     // Initialize on page load
-    toggleVerificationQuestion();
+    toggleContactInfoField();
     
-    // Optional: Add styling for disabled state
+    // Add custom styling for disabled state
     const style = document.createElement('style');
     style.textContent = `
-        #verification-question-container.text-muted .form-label {
-            color: #6c757d !important;
-        }
-        #{{ form.verification_question.id }}:disabled {
+        #{{ form.verification_question.id }}:disabled,
+        #{{ form.is_anonymous.id }}:disabled {
             background-color: #f8f9fa;
             cursor: not-allowed;
             opacity: 0.7;
+        }
+        #{{ form.contact_info.id }}[readonly] {
+            background-color: #f8f9fa;
+            cursor: not-allowed;
         }
     `;
     document.head.appendChild(style);
