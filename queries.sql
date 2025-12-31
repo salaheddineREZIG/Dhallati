@@ -3,8 +3,13 @@
 --DELETE FROM items;
 --DELETE FROM item_images;
 --DELETE FROM reports;
-----DELETE FROM users;
+--DELETE FROM users;
 --DELETE FROM audit_logs;
+--DELETE FROM notifications;
+--DELETE FROM claims;
+--DELETE FROM verification_questions;
+
+
 --
 SELECT * FROM users;
 SELECT * FROM audit_logs;
@@ -43,6 +48,6 @@ SELECT * FROM reports;
 SELECT * FROM item_images;
 SELECT * FROM notifications;
 SELECT * FROM verification_questions; 
-SELECT * FROM claims
+SELECT * FROM claims;
 ------.tables
 ----

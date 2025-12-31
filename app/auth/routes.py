@@ -13,52 +13,25 @@ import requests
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
-    # Note: your original code used form.validate_on_submit() inside GET which is unusual.
-    # I'll keep the same behavior but log unexpected conditions.
+    # If user is already logged in, redirect them
+    if request.cookies.get('id_token'):
+        flash("Already logged in", "info")
+        return redirect(url_for("lost_and_found.lost_and_found_page"))
+    
     try:
-        form = LoginForm()
-        if request.method == 'GET':
-            # If somehow the GET carries form data that validates, we handle it (keeps old logic)
-            if form.validate_on_submit():
-                if request.cookies.get('id_token'):
-                    flash("Already logged in", "info")
-                    return redirect(url_for("lost_and_found.lost_and_found_page"))
-                try:
-                    google = oauth.create_client('google')
-                    redirect_uri = url_for('auth.callback', _external=True)
-                    return google.authorize_redirect(redirect_uri)
-                except requests.exceptions.ConnectionError:
-                    current_app.logger.exception("Connection error while trying to authorize redirect to Google")
-                    flash("Unable to connect to Google. Please check your internet connection.", "danger")
-                    return redirect(url_for('auth.login'))
-                except Exception:
-                    current_app.logger.exception("Unexpected error during Google authorize redirect (GET/validate_on_submit)")
-                    flash("An unexpected error occurred.", "danger")
-                    return redirect(url_for('auth.login'))
-            return render_template('login.html', form=form)
-
-        # POST branch: start OAuth flow (same as your prior code)
-        if request.cookies.get('id_token'):
-            flash("Already logged in", "info")
-            return redirect(url_for("lost_and_found.lost_and_found_page"))
-
-        try:
-            google = oauth.create_client('google')
-            redirect_uri = url_for('auth.callback', _external=True)
-            return google.authorize_redirect(redirect_uri)
-        except requests.exceptions.ConnectionError:
-            current_app.logger.exception("Connection error while trying to authorize redirect to Google (POST)")
-            flash("Unable to connect to Google. Please check your internet connection.", "danger")
-            return redirect(url_for('auth.login'))
-        except Exception:
-            current_app.logger.exception("Unexpected error during Google authorize redirect (POST)")
-            flash("An unexpected error occurred.", "danger")
-            return redirect(url_for('auth.login'))
-
-    except Exception:
-        current_app.logger.exception("Unhandled exception in auth.login")
-        flash("An internal error occurred. Please try again later.", "danger")
-        return redirect(url_for('auth.login'))
+        # For GET requests (from landing page link), start OAuth directly
+        google = oauth.create_client('google')
+        redirect_uri = url_for('auth.callback', _external=True)
+        return google.authorize_redirect(redirect_uri)
+        
+    except requests.exceptions.ConnectionError:
+        current_app.logger.exception("Connection error while trying to authorize redirect to Google")
+        flash("Unable to connect to Google. Please check your internet connection.", "danger")
+        return redirect(url_for('main.index'))  # Redirect back to landing page
+    except Exception as e:
+        current_app.logger.exception(f"Unexpected error during Google authorize redirect: {str(e)}")
+        flash("An unexpected error occurred.", "danger")
+        return redirect(url_for('main.index'))  # Redirect back to landing page
 
 
 @auth.route('/callback')

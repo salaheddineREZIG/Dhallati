@@ -1,0 +1,296 @@
+{% extends 'layout.html' %} 
+
+{% block title %}Dhallati - Lost & Found{% endblock %}
+
+{% block extras %}
+<style>
+.dark-theme .hero-section .lead {
+    color: #ffffff !important;
+}
+
+.dark-theme .floating-card h5 {
+    color: #ffffff !important;
+}
+</style>
+{% endblock %}
+
+{% block main %}
+<!-- Hero Section -->
+<section class="hero-section vh-100 d-flex align-items-center position-relative overflow-hidden">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-1 fw-bold mb-4 animate__animated animate__fadeInUp">
+                    <span class="university-name">University</span> 
+                    <span class="brand-name">Dhallati</span>
+                </h1>
+                <p class="lead mb-4 animate__animated animate__fadeInUp animate__delay-1s">
+                    The official lost and found platform for our university community. 
+                    Reuniting students with their belongings since 2024.
+                </p>
+                <div class="cta-buttons animate__animated animate__fadeInUp animate__delay-2s">
+                    <!-- CHANGE: Direct link to trigger OAuth -->
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg me-3 px-4 py-3 pulse-animation">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Login to Report
+                    </a>
+                    <a href="#features" class="btn btn-outline-primary btn-lg px-4 py-3">
+                        <i class="bi bi-info-circle me-2"></i>Learn More
+                    </a>
+                </div>
+                
+                <!-- Stats (unchanged) -->
+                <div class="stats-container mt-5 pt-3 animate__animated animate__fadeIn animate__delay-3s">
+                    <div class="row">
+                        <div class="col-md-3 col-6">
+                            <div class="stat-card text-center">
+                                <h3 class="stat-number" data-count="1500">0</h3>
+                                <p class="stat-label">Items Found</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="stat-card text-center">
+                                <h3 class="stat-number" data-count="1200">0</h3>
+                                <p class="stat-label">Items Returned</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="stat-card text-center">
+                                <h3 class="stat-number" data-count="98">0</h3>
+                                <p class="stat-label">% Success Rate</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="stat-card text-center">
+                                <h3 class="stat-number" data-count="24">0</h3>
+                                <p class="stat-label">Hours Response</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <!-- Animated Illustration (unchanged) -->
+                <div class="hero-illustration position-relative animate__animated animate__fadeInRight">
+                    <div class="floating-card lost-card">
+                        <div class="card-icon">
+                            <i class="bi bi-search"></i>
+                        </div>
+                        <h5>Report Lost Item</h5>
+                    </div>
+                    <div class="floating-card found-card">
+                        <div class="card-icon">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+                        <h5>Report Found Item</h5>
+                    </div>
+                    <div class="floating-card connect-card">
+                        <div class="card-icon">
+                            <i class="bi bi-arrow-left-right"></i>
+                        </div>
+                        <h5>Connect Owners</h5>
+                    </div>
+                    <div class="main-illustration">
+                        <div class="university-badge">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scroll Indicator -->
+    <div class="scroll-indicator animate__animated animate__bounce animate__delay-4s">
+        <i class="bi bi-chevron-down"></i>
+    </div>
+</section>
+
+<!-- Features Section (unchanged) -->
+<section id="features" class="features-section py-5">
+    <div class="container">
+        <div class="row justify-content-center mb-5">
+            <div class="col-lg-8 text-center">
+                <h2 class="section-title mb-4">How It Works</h2>
+                <p class="section-subtitle">Simple steps to reunite lost items with their owners</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon-wrapper">
+                        <div class="feature-icon">
+                            <i class="bi bi-plus-circle"></i>
+                        </div>
+                        <span class="feature-number">01</span>
+                    </div>
+                    <h4 class="feature-title">Report</h4>
+                    <p class="feature-description">
+                        Report a lost or found item with details, location, and photos. 
+                        Our intelligent system categorizes it instantly.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon-wrapper">
+                        <div class="feature-icon">
+                            <i class="bi bi-search-heart"></i>
+                        </div>
+                        <span class="feature-number">02</span>
+                    </div>
+                    <h4 class="feature-title">Browse</h4>
+                    <p class="feature-description">Browse through all reported items and find what you're looking for.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon-wrapper">
+                        <div class="feature-icon">
+                            <i class="bi bi-chat-heart"></i>
+                        </div>
+                        <span class="feature-number">03</span>
+                    </div>
+                    <h4 class="feature-title">Connect</h4>
+                    <p class="feature-description">
+                        Securely connect finders with owners through our verified platform. 
+                        Arrange returns with campus safety protocols.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section (unchanged) -->
+<section class="testimonials-section py-5">
+    <div class="container">
+        <div class="row justify-content-center mb-5">
+            <div class="col-lg-8 text-center">
+                <h2 class="section-title mb-4">Success Stories</h2>
+                <p class="section-subtitle">What our university community says</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="testimonial-card animate-on-scroll">
+                    <div class="testimonial-content">
+                        <p>if it's Dhallati's will, who dares to stop it.</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Alex" alt="Alex">
+                        <div>
+                            <h6>Changing Star aka "Nephis"</h6>
+                            <p>Computer Science, Senior</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="testimonial-card animate-on-scroll">
+                    <div class="testimonial-content">
+                        <p>damnation, seven parts of weaver's forbiding lineage were lost accross the dream land. Dhallait helped me find them.</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Maria" alt="Maria">
+                        <div>
+                            <h6>Lost From Light aka "Sunless"</h6>
+                            <p>International Relations</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="testimonial-card animate-on-scroll">
+                    <div class="testimonial-content">
+                        <p>I had to betray one of my best friends to save the other. And I did. I chose to sacrifice you to save Neph. Thank you, Dhallati.</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Professor" alt="Professor">
+                        <div>
+                            <h6>Song Of The Fallen aka "Cassia"</h6>
+                            <p>Faculty of Engineering</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section py-5">
+    <div class="container">
+        <div class="cta-card rounded-4 p-5 text-center">
+            <h2 class="cta-title mb-4">Ready to Reunite?</h2>
+            <p class="cta-text mb-4">Join thousands of students and faculty members who trust Dhallati</p>
+            <div class="cta-buttons">
+                <!-- CHANGE: Direct link to trigger OAuth -->
+                <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg px-5 py-3 me-3">
+                    <i class="bi bi-person-plus me-2"></i>Get Started
+                </a>
+                <a href="#" class="btn btn-outline-primary btn-lg px-5 py-3">
+                    <i class="bi bi-question-circle me-2"></i>Help Guide
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Count up animation for stats
+    document.addEventListener('DOMContentLoaded', function() {
+        // Count animation
+        const counters = document.querySelectorAll('.stat-number');
+        const speed = 200;
+        
+        counters.forEach(counter => {
+            const updateCount = () => {
+                const target = +counter.getAttribute('data-count');
+                const count = +counter.innerText;
+                const increment = target / speed;
+                
+                if(count < target) {
+                    counter.innerText = Math.ceil(count + increment);
+                    setTimeout(updateCount, 1);
+                } else {
+                    counter.innerText = target;
+                }
+            }
+            
+            updateCount();
+        });
+        
+        // Scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) {
+                    entry.target.classList.add('animate__animated', 'animate__fadeInUp');
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+        
+        // Smooth scroll
+        document.querySelector('.scroll-indicator').addEventListener('click', () => {
+            document.querySelector('#features').scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+    });
+</script>
+{% endblock %}

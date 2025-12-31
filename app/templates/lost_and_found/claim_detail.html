@@ -1,0 +1,559 @@
+{% extends "layout.html" %}
+{% block title %}Claim Details | Lost & Found{% endblock %}
+
+{% block extras %}
+    
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --primary-gradient: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            --hover-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        .claim-detail-container {
+            min-height: 100vh;
+            background-color: #f8f9fa;
+            padding-bottom: 3rem;
+        }
+
+        .detail-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--card-shadow);
+            border: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .detail-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .detail-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .detail-value {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+        }
+
+        .item-image-large {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+            margin-bottom: 1.5rem;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1.25rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-pending {
+            background-color: rgba(255, 193, 7, 0.15);
+            color: #ffc107;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+
+        .status-accepted {
+            background-color: rgba(40, 167, 69, 0.15);
+            color: #28a745;
+            border: 1px solid rgba(40, 167, 69, 0.3);
+        }
+
+        .status-rejected {
+            background-color: rgba(220, 53, 69, 0.15);
+            color: #dc3545;
+            border: 1px solid rgba(220, 53, 69, 0.3);
+        }
+
+        .status-cancelled {
+            background-color: rgba(108, 117, 125, 0.15);
+            color: #6c757d;
+            border: 1px solid rgba(108, 117, 125, 0.3);
+        }
+
+        .action-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 1rem;
+            min-width: 120px;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .action-btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .action-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+            color: white;
+        }
+
+        .action-btn-outline {
+            border: 2px solid #dee2e6;
+            background: transparent;
+            color: #495057;
+        }
+
+        .action-btn-outline:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(59, 130, 246, 0.05);
+        }
+
+        .action-btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            border: none;
+        }
+
+        .action-btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);
+            color: white;
+        }
+
+        .back-btn {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .back-btn:hover {
+            color: #1d4ed8;
+            text-decoration: underline;
+        }
+
+        .verification-answers {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .verification-answer {
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            background-color: white;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+        }
+
+        @media (max-width: 768px) {
+            .detail-card {
+                padding: 1.5rem;
+            }
+            
+            .action-btn {
+                width: 100%;
+                margin-right: 0;
+            }
+        }
+    </style>
+{% endblock %}
+{% block navbar %}
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3">
+            <div class="container">
+                <a class="navbar-brand fw-bold d-flex align-items-center" href="{{ url_for('lost_and_found.lost_and_found_page') }}" style="color: var(--primary-color);">
+                    <i class="bi bi-search me-2 fs-4"></i>
+                    <span>Lost & Found</span>
+                </a>
+                
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto align-items-center">
+                        <!-- Notifications -->
+                        <li class="nav-item dropdown me-3">
+                            <a class="nav-link position-relative" href="#" id="notificationDropdown" role="button" 
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-bell fs-5"></i>
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
+                                      id="notificationBadge" style="display: none;">
+                                    0
+                                </span>
+                            </a>
+                            
+                            <ul class="dropdown-menu dropdown-menu-end p-0" style="width: 350px; max-height: 400px; overflow-y: auto;">
+                                <li class="dropdown-header bg-light d-flex justify-content-between align-items-center py-3">
+                                    <span class="fw-bold">Notifications</span>
+                                    <button class="btn btn-sm btn-outline-secondary py-1 px-2" id="markAllReadBtn">
+                                        Mark all read
+                                    </button>
+                                </li>
+                                <li><hr class="dropdown-divider m-0"></li>
+                                <div id="notificationList">
+                                    <div class="text-center py-4 text-muted">
+                                        <div class="spinner-border spinner-border-sm" role="status">
+                                            <span class="visually-hidden">Loadin..</['pan']>
+                                        </div>
+                                        <p class="mb-0 mt-2">Loading notifications...</p>
+                                    </div>
+                                </div>
+                                <li class="dropdown-footer text-center p-2">
+                                    <a href="{{ url_for('lost_and_found.claims_management') }}" class="text-decoration-none">
+                                        View all claims
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        
+                        <!-- User avatar dropdown -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link d-flex align-items-center" href="#" id="userDropdown" role="button" 
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                <img src="{{ user['profile_pic'] if user and user['profile_pic'] else url_for('static', filename='images/default-avatar.png') }}" 
+                                     alt="{{ user['name'] if user else 'User' }}" class="rounded-circle me-2" width="36" height="36" style="object-fit: cover;">
+                                <span class="d-none d-md-inline">{{ user['name'].split(' ')[0] if user else 'User' }}</span>
+                                <i class="bi bi-chevron-down ms-1 small"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
+                                <li><a class="dropdown-item" href="{{ url_for('main.profile') }}"><i class="bi bi-person me-2"></i>Profile</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('lost_and_found.new_report') }}"><i class="bi bi-plus-circle me-2"></i>New Report</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('lost_and_found.claims_management') }}"><i class="bi bi-clipboard-check me-2"></i>My Claims</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form action="{{ url_for('auth.logout') }}" method="GET">
+                                        <button type="submit" class="dropdown-item text-danger">
+                                            <i class="bi bi-box-arrow-right me-2"></i>Logout
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+{% endblock %}
+
+{% block main %}
+        <!-- Main Content -->
+        <div class="container py-4">
+            <!-- Back Button -->
+            <a href="{{ url_for('lost_and_found.claims_management') }}" class="back-btn">
+                <i class="bi bi-arrow-left me-2"></i> Back to Claims
+            </a>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <!-- Claim Details Card -->
+                    <div class="detail-card">
+                        <div class="detail-section">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h2 class="fw-bold mb-0">Claim Details</h2>
+                                <span class="status-badge {{ 'status-' + claim['status'] }}">
+                                    {{ claim['status']|capitalize }}
+                                </span>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="detail-label">Claim ID</div>
+                                    <div class="detail-value">#{{ claim['id'] }}</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="detail-label">Submitted</div>
+                                    <div class="detail-value">{{ claim['created_at'] }}</div>
+                                </div>
+                            </div>
+                            
+                            {% if claim['resolved_at'] %}
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="detail-label">Resolved</div>
+                                        <div class="detail-value">{{ claim['resolved_at'] }}</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="detail-label">Reason</div>
+                                        <div class="detail-value">{{ claim['reason'] or 'No reason provided' }}</div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            
+                            {% if claim['expires_at'] and claim['status'] == 'pending' %}
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="detail-label">Expires</div>
+                                        <div class="detail-value text-warning">
+                                            <i class="bi bi-clock me-1"></i>
+                                            {{ claim['expires_at'] }}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Item Information -->
+                        <div class="detail-section">
+                            <h4 class="fw-bold mb-3">Item Information</h4>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="detail-label">Item Name</div>
+                                    <div class="detail-value">{{ claim['item']['name'] }}</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="detail-label">Category</div>
+                                    <div class="detail-value">{{ claim['item']['category_id'] }}</div>
+                                </div>
+                            </div>
+                            
+                            {% if claim['item']['description'] %}
+                                <div class="detail-label mt-2">Description</div>
+                                <div class="detail-value">{{ claim['item']['description'] }}</div>
+                            {% endif %}
+                            
+<!-- Replace the image section with: -->
+{% if claim['item']['images'] and claim['item']['images']|length > 0 %}
+    <div class="detail-label mt-2">Image</div>
+    {% set url = claim['item']['images'][0]['image_url']|replace('app\\','')|replace('\\','/') %}
+    <img src="{{ url if url.startswith('/') else '/' ~ url }}" 
+         alt="{{ claim['item']['name'] }}" 
+         class="item-image-large mt-1"
+         data-bs-toggle="modal" 
+         data-bs-target="#imageModal"
+         onclick="showImageModal('{{ url if url.startswith('/') else '/' ~ url }}')"
+         style="cursor: pointer;">
+{% else %}
+    <div class="detail-label mt-2">Image</div>
+    <img src="{{ url_for('static', filename='images/default.png') }}"
+         alt="No image available"
+         class="item-image-large mt-1"
+         data-bs-toggle="modal" 
+         data-bs-target="#imageModal"
+         onclick="showImageModal('{{ url_for('static', filename='images/default.png') }}')"
+         style="cursor: pointer;">
+{% endif %}                        </div>
+
+                        <!-- Parties Information -->
+                        <div class="detail-section">
+                            <h4 class="fw-bold mb-3">Parties Involved</h4>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="detail-label">Reporter (Owner)</div>
+                                    <div class="detail-value">{{ claim['reporter']['name'] }}</div>
+                                    <div class="text-muted small">{{ claim['reporter']['email'] }}</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="detail-label">Claimant</div>
+                                    <div class="detail-value">{{ claim['claimant']['name'] }}</div>
+                                    <div class="text-muted small">{{ claim['claimant']['email'] }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Verification Answers -->
+                        {% if claim['verification_answers'] %}
+                            <div class="detail-section">
+                                <h4 class="fw-bold mb-3">Verification Answers</h4>
+                                <div class="verification-answers">
+                                    {% if claim['verification_answers'] is string %}
+                                        <div class="verification-answer">
+                                            {{ claim['verification_answers'] }}
+                                        </div>
+                                    {% elif claim['verification_answers'] is mapping %}
+                                        {% for key, value in claim['verification_answers'].items() %}
+                                            <div class="verification-answer">
+                                                <strong>{{ key|replace('_', ' ')|title }}:</strong> {{ value }}
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <!-- Action Card -->
+                    <div class="detail-card">
+                        <h4 class="fw-bold mb-3">Actions</h4>
+                        
+                        {% if claim['status'] == 'pending' %}
+                            {% if user['id'] == claim['reporter_id'] %}
+                                <!-- Reporter actions -->
+                                <div class="mb-3">
+                                    <p class="text-muted small mb-3">
+                                        You received this claim request. Please review and respond.
+                                    </p>
+                                    <div class="d-grid gap-2">
+                                        <button class="action-btn action-btn-primary" id="acceptBtn">
+                                            <i class="bi bi-check me-1"></i> Accept Claim
+                                        </button>
+                                        <button class="action-btn action-btn-outline" id="rejectBtn">
+                                            <i class="bi bi-x me-1"></i> Reject Claim
+                                        </button>
+                                    </div>
+                                </div>
+                            {% elif user['id'] == claim['claimant_id'] %}
+                                <!-- Claimant actions -->
+                                <div class="mb-3">
+                                    <p class="text-muted small mb-3">
+                                        You submitted this claim request. You can cancel it if needed.
+                                    </p>
+                                    <div class="d-grid gap-2">
+                                        <button class="action-btn action-btn-outline" id="cancelBtn">
+                                            <i class="bi bi-x-circle me-1"></i> Cancel Claim
+                                        </button>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                        
+                        <!-- View Item Details -->
+                        <div class="mb-3">
+                            <div class="d-grid gap-2">
+                                <a href="/lost_and_found/item?id={{ claim['item']['id'] }}" 
+                                   class="action-btn action-btn-outline">
+                                    <i class="bi bi-eye me-1"></i> View Item Details
+                                </a>
+                                <a href="{{ url_for('lost_and_found.claims_management') }}" 
+                                   class="action-btn action-btn-outline">
+                                    <i class="bi bi-list-ul me-1"></i> All Claims
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- Status Information -->
+                        <div class="alert alert-light border">
+                            <h6 class="fw-bold mb-2">Claim Status</h6>
+                            <p class="mb-1 small">
+                                {% if claim['status'] == 'pending' %}
+                                    This claim is awaiting review by the reporter.
+                                {% elif claim['status'] == 'accepted' %}
+                                    This claim has been accepted by the reporter.
+                                {% elif claim['status'] == 'rejected' %}
+                                    This claim has been rejected by the reporter.
+                                {% elif claim['status'] == 'cancelled' %}
+                                    This claim was cancelled by the claimant.
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+{% block scripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const claimId = {{ claim['id'] }};
+            
+            // Handle accept button
+            const acceptBtn = document.getElementById('acceptBtn');
+            if (acceptBtn) {
+                acceptBtn.addEventListener('click', function() {
+                    handleClaimAction('accept');
+                });
+            }
+            
+            // Handle reject button
+            const rejectBtn = document.getElementById('rejectBtn');
+            if (rejectBtn) {
+                rejectBtn.addEventListener('click', function() {
+                    const reason = prompt('Please provide a reason for rejection (optional):');
+                    if (reason !== null) {
+                        handleClaimAction('reject', reason);
+                    }
+                });
+            }
+            
+            // Handle cancel button
+            const cancelBtn = document.getElementById('cancelBtn');
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', function() {
+                    if (confirm('Are you sure you want to cancel this claim?')) {
+                        handleClaimCancel();
+                    }
+                });
+            }
+            
+            // Function to handle claim actions
+            async function handleClaimAction(action, reason = '') {
+                try {
+                    const response = await fetch(`/lost_and_found/api/claims/${claimId}/respond`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            action: action,
+                            reason: reason
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        alert(data.message || `Claim ${action}ed successfully`);
+                        window.location.reload();
+                    } else {
+                        alert(data.error || 'Failed to process request');
+                    }
+                } catch (error) {
+                    console.error('Error responding to claim:', error);
+                    alert('An error occurred. Please try again.');
+                }
+            }
+            
+            // Function to handle claim cancellation
+            async function handleClaimCancel() {
+                try {
+                    const response = await fetch(`/lost_and_found/api/claims/${claimId}/cancel`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        }
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        alert(data.message || 'Claim cancelled successfully');
+                        window.location.reload();
+                    } else {
+                        alert(data.error || 'Failed to cancel claim');
+                    }
+                } catch (error) {
+                    console.error('Error cancelling claim:', error);
+                    alert('An error occurred. Please try again.');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+{% endblock %}

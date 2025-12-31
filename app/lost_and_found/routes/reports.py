@@ -245,8 +245,6 @@ def report_item(user):
             # Delete image files from filesystem
             for image_url in image_urls:
                 current_app.logger.info(f"Deleting image file: {image_url}")
-                img=Image.open(image_url)
-                img.show()
                 try:
                     if os.path.exists(image_url):
                         os.remove(image_url)

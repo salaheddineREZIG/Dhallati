@@ -8,7 +8,7 @@ from flask import request, jsonify, make_response
 
 @main.route('/') 
 def index(): 
-    return render_template('index.html') 
+    return render_template('landing.html') 
 
 
 @main.route('/profile')

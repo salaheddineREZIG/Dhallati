@@ -12,13 +12,7 @@ def enum_to_str(val):
 
 
 # ---------- Enums ---------- #
-class ItemStatus(enum.Enum):
-    LOST = 'lost'
-    FOUND = 'found'
-    CLAIMED_PENDING = 'claimed_pending'
-    CLAIMED = 'claimed'
-    RETURNED = 'returned'
-    ARCHIVED = 'archived'
+# ---------- Enums ---------- #
 
 
 class ReportType(enum.Enum):
@@ -35,7 +29,6 @@ class ClaimStatus(enum.Enum):
 
 class NotificationType(enum.Enum):
     ITEM_FOUND = 'item_found'
-    ANONYMOUS_ITEM_FOUND = 'anonymous_item_found'
     CLAIM_REQUEST = 'claim_request'
     CLAIM_REQUEST_ANONYMOUS = 'claim_request_anonymous'
     CLAIM_ACCEPTED = 'claim_accepted'
@@ -45,49 +38,15 @@ class NotificationType(enum.Enum):
     ITEM_RETURNED = 'item_returned'
 
 
-# ---------- Category ---------- #
-class Category(db.Model):
-    __tablename__ = 'categories'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), nullable=False, unique=True, index=True)
-    description = db.Column(db.Text, nullable=True)
-
-    items = db.relationship('Item', back_populates='category', lazy='select')
-
-    def __repr__(self):
-        return f"<Category id={self.id} name={self.name}>"
-
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'description': self.description
-        }
+# ---------- Enums ---------- #
+class ItemStatus(enum.Enum):
+    LOST = 'lost'
+    FOUND = 'found'
+    CLAIMED = 'claimed'
+    RECOVERED = 'recovered'  # New status for lost items that have been found
 
 
-# ---------- Location ---------- #
-class Location(db.Model):
-    __tablename__ = 'locations'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(150), nullable=False, unique=True, index=True)
-    description = db.Column(db.Text, nullable=True)
-
-    # Relationships
-    reports = db.relationship('Report', back_populates='location', lazy='select')
-
-    def __repr__(self):
-        return f"<Location id={self.id} name={self.name}>"
-
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'description': self.description,
-        }
-
-
-# ---------- Item ---------- #
+# ---------- Item Model Update ---------- #
 class Item(db.Model):
     __tablename__ = 'items'
     id = db.Column(db.Integer, primary_key=True)
@@ -136,7 +95,7 @@ class Item(db.Model):
         Index('ix_items_category_status', 'category_id', 'status'),
         Index('ix_items_found_by', 'found_by_id'),
         CheckConstraint(
-            "status IN ('lost', 'found', 'claimed_pending', 'claimed', 'returned', 'archived')",
+            "status IN ('lost', 'found', 'claimed', 'recovered')",  # Updated to include 'recovered'
             name='ck_items_valid_status'
         ),
         CheckConstraint(
@@ -186,11 +145,10 @@ class Item(db.Model):
         }
     
     def is_claimable(self):
-        return self.status in ['found', 'claimed_pending']
+        return self.status in ['found', 'lost']  # Lost items can be claimed as found
     
     def is_own_item(self, user_id):
         return self.reporter_id == user_id
-
 
 # ---------- Report ---------- #
 class Report(db.Model):
@@ -258,7 +216,6 @@ class Report(db.Model):
     def is_found_report(self):
         return self.report_type == 'found'
 
-
 # ---------- VerificationQuestion ---------- #
 class VerificationQuestion(db.Model):
     __tablename__ = 'verification_questions'
@@ -276,6 +233,45 @@ class VerificationQuestion(db.Model):
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
 
+
+# ---------- Category ---------- #
+class Category(db.Model):
+    __tablename__ = 'categories'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), nullable=False, unique=True, index=True)
+    description = db.Column(db.Text, nullable=True)
+
+    items = db.relationship('Item', back_populates='category', lazy='select')
+
+    def __repr__(self):
+        return f"<Category id={self.id} name={self.name}>"
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description
+        }
+        
+class Location(db.Model):
+    __tablename__ = 'locations'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(150), nullable=False, unique=True, index=True)
+    description = db.Column(db.Text, nullable=True)
+
+    # Relationships
+    reports = db.relationship('Report', back_populates='location', lazy='select')
+
+    def __repr__(self):
+        return f"<Location id={self.id} name={self.name}>"
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+        }
 
 # ---------- Claim ---------- #
 class Claim(db.Model):
@@ -339,7 +335,7 @@ class Claim(db.Model):
     def is_expired(self):
         if not self.expires_at or self.status != 'pending':
             return False
-        return datetime.now(timezone=True) > self.expires_at
+        return datetime.now() > self.expires_at
     
     def is_claimable_by_user(self, user_id):
         if self.status != 'pending':
@@ -353,6 +349,7 @@ class Claim(db.Model):
         return True
 
 
+# ---------- Notification ---------- #
 # ---------- Notification ---------- #
 class Notification(db.Model):
     __tablename__ = 'notifications'
@@ -374,7 +371,7 @@ class Notification(db.Model):
         Index('ix_notifications_is_read', 'is_read'),
         Index('ix_notifications_user_created', 'user_id', 'created_at'),
         CheckConstraint(
-            "notification_type IN ('item_found', 'anonymous_item_found', 'claim_request', 'claim_request_anonymous', 'claim_accepted', 'claim_rejected', 'claim_cancelled', 'claim_accepted_confirmation', 'item_returned', 'claim_expired')",
+            "notification_type IN ('item_found', 'claim_request', 'claim_request_anonymous', 'claim_accepted', 'claim_rejected', 'claim_cancelled', 'claim_accepted_confirmation', 'item_returned', 'item_claimed', 'item_recovered')",
             name='ck_notifications_valid_type'
         ),
     )

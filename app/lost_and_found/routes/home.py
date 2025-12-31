@@ -23,7 +23,11 @@ def format_date(date_str):
 @lost_and_found.route('/lost_and_found')
 @login_required
 def lost_and_found_page(user):
-    return render_template('lost_and_found.html')
+    user ={
+        'name': user['name'],
+        'profile_pic': user.get('profile_pic', None)
+    }
+    return render_template('lost_and_found.html', user=user)
 
 
 @lost_and_found.route('/lost_and_found/categories', methods=['GET'])
@@ -239,8 +243,8 @@ def item(user):
             report_dict['location_name'] = report.location.name
             item_dict['location_name'] = report.location.name
         
-        # Handle anonymous reports
-        if report.is_anonymous:
+        # Handle anonymous reports (only for found items)
+        if report.is_anonymous and report.report_type == 'found':
             report_dict['reporter_name'] = "Anonymous User"
             report_dict['contact_info'] = "Contact via platform"
             item_dict['reporter_name'] = "Anonymous User"
@@ -256,30 +260,25 @@ def item(user):
         can_claim = False
         claim_message = ""
         
-        if item.status.lower() == 'found':
+        if item.status == 'found':
             # User cannot claim their own found item
             if report.reporter_id != user['id']:
                 can_claim = True
                 claim_message = "Request to Claim this Item"
             else:
                 claim_message = "You reported this found item"
-
-        elif item.status.lower() == 'lost':
-            # For lost items, users can contact the reporter
+                
+        elif item.status == 'lost':
+            # For lost items, users can contact the reporter to say they found it
             if report.reporter_id != user['id']:
                 can_claim = True
-                claim_message = "Contact Reporter"
+                claim_message = "I Found This Item"
             else:
                 claim_message = "You reported this lost item"
-        
-        if item.status.lower() == 'claimed':
+                
+        elif item.status == 'claimed':
             claim_message = f"Claimed by {item_dict.get('claimed_by_name', 'someone')}"
-        elif item.status.lower() == 'returned':
-            claim_message = "Item has been returned to owner"
         
-        else:   
-            can_claim= True
-            claim_message = "Request to Claim this Item"
         # Format dates nicely
         if item_dict.get('created_at'):
             item_dict['formatted_date'] = format_date(item_dict['created_at'])
@@ -288,7 +287,13 @@ def item(user):
         if item_dict.get('claimed_at'):
             item_dict['formatted_claimed_date'] = format_date(item_dict['claimed_at'])
             
-        current_app.logger.info(f"Rendering item detail for id={item_id} by user id={user['id']}"+ f" (can_claim={can_claim})"  + f" (item status={item.status})")
+        current_app.logger.info(f"Rendering item detail for id={item_id} by user id={user['id']}" + f" (can_claim={can_claim})")
+        
+        user ={
+        'name': user['name'],
+        'profile_pic': user.get('profile_pic', None)
+        }
+
         
         return render_template(
             'item_detail.html', 
@@ -298,10 +303,10 @@ def item(user):
             can_claim=can_claim,
             claim_message=claim_message,
             item_id=item_id,
-            reporter_id=report.reporter_id
+            reporter_id=report.reporter_id,
+            user=user
         )
         
-
     except Exception as e:
         current_app.logger.exception(f"Failed to render item detail for id={request.args.get('id')}")
         flash(f"An error occurred while loading the item details", "danger")

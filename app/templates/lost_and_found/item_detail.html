@@ -71,69 +71,165 @@
         max-height: 80vh;
         object-fit: contain;
     }
+    
+    /* Contact Info Modal Styles */
+    .contact-modal .modal-content {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    
+    .contact-header {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        color: white;
+        padding: 1.5rem;
+    }
+    
+    .contact-icon {
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+    }
+    
+    .contact-info-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem;
+        border-bottom: 1px solid #e5e7eb;
+        transition: background 0.2s;
+    }
+    
+    .contact-info-item:hover {
+        background: #f9fafb;
+    }
+    
+    .contact-info-item:last-child {
+        border-bottom: none;
+    }
+    
+    .contact-icon-small {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        flex-shrink: 0;
+    }
+    
+    .contact-icon-name {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+    
+    .contact-icon-email {
+        background: #f0f9ff;
+        color: #0369a1;
+    }
+    
+    .contact-icon-phone {
+        background: #f0fdf4;
+        color: #16a34a;
+    }
+    
+    .contact-label {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-bottom: 0.25rem;
+    }
+    
+    .contact-value {
+        font-weight: 500;
+        color: #1f2937;
+    }
+      :root {
+    --primary-color: #3b82f6;
+    }
 </style>
 {% endblock %}
 
 {% block navbar  %}
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
-    <div class="container">
-        <a class="navbar-brand fw-bold text-primary" href="{{ url_for('lost_and_found.lost_and_found_page') }}">
-            Lost & Found
-        </a>
-        
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto align-items-center">
-                <li class="nav-item me-3">
-                    <a class="nav-link" href="{{ url_for('main.profile') }}">
-                        <i class="bi bi-person-circle me-1"></i>Profile
-                    </a>
-                </li>
-<li class="nav-item dropdown">
-    <a class="nav-link position-relative" href="#" id="notificationDropdown" role="button" 
-       data-bs-toggle="dropdown" aria-expanded="false">
-        <i class="bi bi-bell fs-5"></i>
-        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
-              id="notificationBadge" style="display: none;">
-            0
-        </span>
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3">
+  <div class="container">
+    <!-- Brand/App Name -->
+    <a class="navbar-brand fw-bold d-flex align-items-center" href="{{ url_for('lost_and_found.lost_and_found_page') }}" style="color: var(--primary-color);">
+      <i class="bi bi-search me-2 fs-4"></i>
+      <span>Lost & Found</span>
     </a>
     
-    <ul class="dropdown-menu dropdown-menu-end p-0" style="width: 350px; max-height: 400px; overflow-y: auto;">
-        <li class="dropdown-header bg-light d-flex justify-content-between align-items-center">
-            <span class="fw-bold">Notifications</span>
-            <button class="btn btn-sm btn-outline-secondary" id="markAllReadBtn">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-center">        
+        <!-- Notifications -->
+        <!-- <li class="nav-item dropdown me-3"> -->
+          <a class="nav-link position-relative" href="#" id="notificationDropdown" role="button" 
+             data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-bell fs-5"></i>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
+                  id="notificationBadge" style="display: none;">
+              0
+            </span>
+          </a>
+          
+          <ul class="dropdown-menu dropdown-menu-end p-0" style="width: 350px; max-height: 400px; overflow-y: auto;">
+            <li class="dropdown-header bg-light d-flex justify-content-between align-items-center py-3">
+              <span class="fw-bold">Notifications</span>
+              <button class="btn btn-sm btn-outline-secondary py-1 px-2" id="markAllReadBtn">
                 Mark all read
-            </button>
-        </li>
-        <li><hr class="dropdown-divider m-0"></li>
-        <div id="notificationList">
-            <!-- Dynamic content -->
-            <div class="text-center py-4 text-muted">
-                <i class="bi bi-bell-slash fs-3"></i>
-                <p class="mb-0 mt-2">No notifications</p>
+              </button>
+            </li>
+            <li><hr class="dropdown-divider m-0"></li>
+            <div id="notificationList">
+              <!-- Dynamic content -->
+              <div class="text-center py-4 text-muted">
+                <div class="spinner-border spinner-border-sm" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mb-0 mt-2">Loading notifications...</p>
+              </div>
             </div>
-        </div>
-        <li class="dropdown-footer text-center p-2">
-            <a href="" class="text-decoration-none">
-                View all notifications
-            </a>
+            <li class="dropdown-footer text-center p-2">
+              <a href="{{ url_for('lost_and_found.claims_management') }}" class="text-decoration-none">
+                View all claims
+              </a>
+            </li>
+          </ul>
         </li>
-    </ul>
-</li>
-                <li class="nav-item">
-                    <form action="{{ url_for('auth.logout') }}" method="GET">
-                        <button type="submit" class="btn btn-outline-danger">
-                            <i class="bi bi-box-arrow-right me-1"></i>Logout
-                        </button>
-                    </form>
-                </li>
-            </ul>
-        </div>
+        
+        <!-- User avatar dropdown -->
+        <li class="nav-item dropdown">
+          <a class="nav-link d-flex align-items-center" href="#" id="userDropdown" role="button" 
+             data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="{{ user.profile_pic if user and user.profile_pic else url_for('static', filename='images/default-avatar.png') }}" 
+                 alt="{{ user.name }}" class="rounded-circle me-2" width="36" height="36" style="object-fit: cover;">
+            <span class="d-none d-md-inline">{{ user.name.split(' ')[0] if user else 'User' }}</span>
+            <i class="bi bi-chevron-down ms-1 small"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
+            <li><a class="dropdown-item" href="{{ url_for('main.profile') }}"><i class="bi bi-person me-2"></i>Profile</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('lost_and_found.new_report') }}"><i class="bi bi-plus-circle me-2"></i>New Report</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('lost_and_found.claims_management') }}"><i class="bi bi-clipboard-check me-2"></i>My Claims</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <form action="{{ url_for('auth.logout') }}" method="GET">
+                <button type="submit" class="dropdown-item text-danger">
+                  <i class="bi bi-box-arrow-right me-2"></i>Logout
+                </button>
+              </form>
+            </li>
+          </ul>
+        </li>
+      </ul>
     </div>
+  </div>
 </nav>
 {% endblock %}
 
@@ -142,13 +238,19 @@
     <div class="row g-4">
         <!-- Left Column: Images -->
         <div class="col-lg-6">
-                        <div class="row g-2 mb-4">
+            <div class="row g-2 mb-4">
                 <div class="col-4">
                     <div class="card text-center py-3 info-card">
                         <div class="card-body p-2">
                             <div class="text-muted small">Status</div>
                             <div class="fw-bold">
-                                <span class="badge bg-primary status-badge">{{ item["status"]|capitalize }}</span>
+                                {% if item["status"] == 'lost' %}
+                                    <span class="badge bg-warning status-badge">{{ item["status"]|capitalize }}</span>
+                                {% elif item["status"] == 'found' %}
+                                    <span class="badge bg-info status-badge">{{ item["status"]|capitalize }}</span>
+                                {% elif item["status"] == 'claimed' %}
+                                    <span class="badge bg-success status-badge">{{ item["status"]|capitalize }}</span>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -193,19 +295,18 @@
             </div>
 
             <!-- Thumbnails -->
-           <!-- Thumbnails -->
-{% if item["images"] and item["images"]|length > 1 %}
-<div class="d-flex flex-wrap gap-2 mb-4" id="thumbnail-container">
-    {% for image in item["images"] %}
-        {% set thumb_url = image['image_url']|replace('app\\','')|replace('\\','/') %}
-        <img src="{{ thumb_url if thumb_url.startswith('/') else '/' ~ thumb_url }}"
-             class="thumbnail {% if loop.first %}active{% endif %}"
-             alt="{{ item['name'] }} thumbnail {{ loop.index }}"
-             data-index="{{ loop.index0 }}"
-             onclick="changeMainImage('{{ thumb_url if thumb_url.startswith('/') else '/' ~ thumb_url }}', this, {{ loop.index0 }})">
-    {% endfor %}
-</div>
-{% endif %}
+            {% if item["images"] and item["images"]|length > 1 %}
+            <div class="d-flex flex-wrap gap-2 mb-4" id="thumbnail-container">
+                {% for image in item["images"] %}
+                    {% set thumb_url = image['image_url']|replace('app\\','')|replace('\\','/') %}
+                    <img src="{{ thumb_url if thumb_url.startswith('/') else '/' ~ thumb_url }}"
+                         class="thumbnail {% if loop.first %}active{% endif %}"
+                         alt="{{ item['name'] }} thumbnail {{ loop.index }}"
+                         data-index="{{ loop.index0 }}"
+                         onclick="changeMainImage('{{ thumb_url if thumb_url.startswith('/') else '/' ~ thumb_url }}', this, {{ loop.index0 }})">
+                {% endfor %}
+            </div>
+            {% endif %}
         </div>
 
         <!-- Right Column: Details -->
@@ -232,7 +333,7 @@
                         <div class="col-sm-4 detail-label">Reported by:</div>
                         <div class="col-sm-8 detail-value">
                             {{ item["reporter_name"] or "Anonymous" }}
-                            {% if report["is_anonymous"] %}
+                            {% if report["is_anonymous"] and report["report_type"] == 'found' %}
                                 <span class="badge bg-secondary ms-2">Anonymous</span>
                             {% endif %}
                         </div>
@@ -281,6 +382,18 @@
                         </div>
                     </div>
                     {% endif %}
+                    
+                    {% if item["found_by"] %}
+                    <div class="row mb-2">
+                        <div class="col-sm-4 detail-label">Found by:</div>
+                        <div class="col-sm-8 detail-value">
+                            {{ item["found_by"]["name"] }}
+                            {% if item["found_at"] %}
+                                <div class="text-muted small">on {{ item["found_at"][:10] }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
 
@@ -291,25 +404,20 @@
                 </div>
                 <div class="card-body">
                     
-                    {% if item["status"]|lower == 'lost' %}
+                    {% if item["status"] == 'lost' %}
                         <div class="alert alert-warning mb-3">
                             <i class="bi bi-exclamation-triangle me-2"></i>
                             This item is marked as <strong>lost</strong>. If you found it, please contact the reporter.
                         </div>
-                    {% elif item["status"]|lower == 'found' %}
+                    {% elif item["status"] == 'found' %}
                         <div class="alert alert-info mb-3">
                             <i class="bi bi-info-circle me-2"></i>
                             This item is marked as <strong>found</strong>. If you believe it's yours, request a claim.
                         </div>
-                    {% elif item["status"]|lower == 'claimed' %}
+                    {% elif item["status"] == 'claimed' %}
                         <div class="alert alert-success mb-3">
                             <i class="bi bi-check-circle me-2"></i>
                             This item has been <strong>claimed</strong>.
-                        </div>
-                    {% elif item["status"]|lower == 'returned' %}
-                        <div class="alert alert-success mb-3">
-                            <i class="bi bi-check-circle-fill me-2"></i>
-                            This item has been <strong>returned</strong> to its owner.
                         </div>
                     {% endif %}
 
@@ -352,6 +460,7 @@
         </div>
     </div>
 </div>
+
 <!-- Claim Process Modal -->
 <div class="modal fade" id="claimModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -369,6 +478,80 @@
         </div>
     </div>
 </div>
+
+<!-- Contact Info Modal -->
+<div class="modal fade contact-modal" id="contactInfoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="contact-header text-center">
+                <div class="contact-icon">
+                    <i class="bi bi-person-check fs-1"></i>
+                </div>
+                <h4 class="mb-2">Contact Information</h4>
+                <p class="mb-0 opacity-75">The reporter has been notified of your claim</p>
+            </div>
+            <div class="modal-body p-0">
+                <div id="contactInfoContent">
+                    <!-- Dynamic content will be inserted here -->
+                </div>
+                <div class="p-3 bg-light border-top">
+                    <div class="alert alert-info mb-0">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <small>Please contact the reporter to arrange the return. They have been notified of your claim.</small>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                    <i class="bi bi-check-circle me-1"></i>Got it
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Success Message Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <div class="mb-4">
+                    <!-- Success Icon -->
+                    <div class="rounded-circle bg-success bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-check-circle-fill text-success fs-1"></i>
+                    </div>
+                    
+                    <!-- Dynamic Title -->
+                    <h4 class="modal-title fw-bold mb-3" id="successModalTitle">Success!</h4>
+                    
+                    <!-- Dynamic Message Content -->
+                    <div id="successMessageContent" class="mb-4">
+                        <p class="text-muted">Your request has been submitted successfully.</p>
+                    </div>
+                    
+                    <!-- Optional Additional Info -->
+                    <div class="alert alert-info mx-auto" style="max-width: 400px;" id="successAdditionalInfo">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <small>You'll be notified when the reporter responds to your claim.</small>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="d-grid gap-2 col-8 mx-auto">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                        <i class="bi bi-check-circle me-1"></i>Continue
+                    </button>
+                    <a href="{{ url_for('lost_and_found.claims_management') }}" 
+                       class="btn btn-outline-secondary">
+                        <i class="bi bi-clipboard-check me-1"></i>View My Claims
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -376,7 +559,7 @@
 // Store current image index
 let currentImageIndex = 0;
 
-// Image handling
+// Image handling (unchanged)
 function changeMainImage(src, element, index) {
     const mainImg = document.querySelector('.item-image');
     if (mainImg) {
@@ -414,7 +597,7 @@ function navigateImages(direction) {
     }
 }
 
-// CLAIM MODAL FUNCTIONS
+// CLAIM MODAL FUNCTIONS - CORRECTED LOGIC
 function showClaimModal(itemId, status, reportType, isAnonymous, verificationQuestions) {
     const modal = document.getElementById('claimModal');
     
@@ -422,20 +605,13 @@ function showClaimModal(itemId, status, reportType, isAnonymous, verificationQue
 
     // Set up modal based on the scenario
     if (reportType === 'lost') {
-        if (!isAnonymous) {
-            console.log('showLostNotAnonymousModal');
-            showLostNotAnonymousModal(itemId);
-        } else {
-            console.log('showLostAnonymousModal');
-            showLostAnonymousModal(itemId);
-        }
+        // Lost items - always show contact info immediately
+        showLostItemModal(itemId);
     } else if (reportType === 'found') {
-        if (!isAnonymous) {
-            console.log('showFoundNotAnonymousModal');
-            showFoundNotAnonymousModal(itemId, verificationQuestions);
-        } else {
-            console.log('showFoundAnonymousModal');
+        if (isAnonymous) {
             showFoundAnonymousModal(itemId, verificationQuestions);
+        } else {
+            showFoundNotAnonymousModal(itemId, verificationQuestions);
         }
     }
     
@@ -444,26 +620,27 @@ function showClaimModal(itemId, status, reportType, isAnonymous, verificationQue
     bsModal.show();
 }
 
-function showLostNotAnonymousModal(itemId) {
+function showLostItemModal(itemId) {
     const modalTitle = document.getElementById('claimModalTitle');
     const modalBody = document.getElementById('claimModalBody');
     const modalFooter = document.getElementById('claimModalFooter');
     
-    modalTitle.textContent = 'Confirm Finding Lost Item';
+    modalTitle.textContent = 'Report Finding Lost Item';
     
     modalBody.innerHTML = `
         <div class="alert alert-info">
             <i class="bi bi-info-circle me-2"></i>
-            You're about to report that you found this lost item.
+            You're about to report that you found this lost item. The owner will be notified immediately and you'll receive their contact information.
         </div>
-        
+                
         <div class="card mb-3">
             <div class="card-body">
                 <h6><i class="bi bi-check-circle text-success me-2"></i>What happens next?</h6>
                 <ul class="mb-0">
-                    <li>The reporter will be notified immediately</li>
-                    <li>After clicking "Notify Reporter", their contact information will be shown</li>
-                    <li>You can arrange the return with them directly</li>
+                    <li>The owner will be notified immediately</li>
+                    <li>You will receive the owner's contact information</li>
+                    <li>You can contact the owner using the provided information</li>
+                    <li>The owner must accept your claim to update the item status</li>
                     <li>Please only proceed if you're certain this is the item</li>
                 </ul>
             </div>
@@ -479,67 +656,14 @@ function showLostNotAnonymousModal(itemId) {
     
     modalFooter.innerHTML = `
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-success" id="notifyReporterBtn" onclick="handleLostItemFound(${itemId})" disabled>
-            <i class="bi bi-bell me-1"></i>Notify Reporter
+        <button type="button" class="btn btn-success" id="foundItemBtn" onclick="handleLostItemFound(${itemId})" disabled>
+            <i class="bi bi-check-circle me-1"></i>I Found This Item
         </button>
     `;
     
     // Enable button only when checkbox is checked
     document.getElementById('confirmFinding')?.addEventListener('change', function() {
-        document.getElementById('notifyReporterBtn').disabled = !this.checked;
-    });
-}
-
-function showLostAnonymousModal(itemId) {
-    const modalTitle = document.getElementById('claimModalTitle');
-    const modalBody = document.getElementById('claimModalBody');
-    const modalFooter = document.getElementById('claimModalFooter');
-    
-    modalTitle.textContent = 'Report Finding Anonymous Lost Item';
-    
-    modalBody.innerHTML = `
-        <div class="alert alert-warning">
-            <i class="bi bi-shield-lock me-2"></i>
-            The reporter has chosen to remain anonymous.
-        </div>
-        
-        <div class="card mb-3">
-            <div class="card-body">
-                <h6><i class="bi bi-key text-warning me-2"></i>Secure Matching Process</h6>
-                <p>To protect the reporter's privacy, we use a secure matching system:</p>
-                <ul class="mb-0">
-                    <li>Your message will be forwarded to the reporter anonymously</li>
-                    <li>The reporter will decide whether to contact you</li>
-                    <li>If they choose to respond, contact will be established through our secure system</li>
-                    <li>Your contact information remains private until you agree to share it</li>
-                </ul>
-            </div>
-        </div>
-        
-        <div class="mb-3">
-            <label for="messageToReporter" class="form-label">Message to Reporter (Optional but recommended)</label>
-            <textarea class="form-control" id="messageToReporter" rows="3" 
-                      placeholder="Please describe where/how you found the item, or any identifying details to help verify it's theirs..."></textarea>
-            <div class="form-text">This helps the reporter confirm it's their item before responding.</div>
-        </div>
-        
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="agreeToProcess">
-            <label class="form-check-label" for="agreeToProcess">
-                I understand and agree to this secure matching process
-            </label>
-        </div>
-    `;
-    
-    modalFooter.innerHTML = `
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-success" id="sendSecureMessageBtn" onclick="handleAnonymousLostItemFound(${itemId})" disabled>
-            <i class="bi bi-send me-1"></i>Send Secure Message
-        </button>
-    `;
-    
-    document.getElementById('agreeToProcess')?.addEventListener('change', function() {
-        document.getElementById('sendSecureMessageBtn').disabled = !this.checked;
+        document.getElementById('foundItemBtn').disabled = !this.checked;
     });
 }
 
@@ -582,7 +706,7 @@ function showFoundNotAnonymousModal(itemId, verificationQuestions) {
     modalBody.innerHTML = `
         <div class="alert alert-info">
             <i class="bi bi-info-circle me-2"></i>
-            You're requesting to claim this found item.
+            You're requesting to claim this found item. Since the reporter is not anonymous, you'll receive their contact information immediately after submitting your claim.
         </div>
         
         ${questionsHTML}
@@ -592,9 +716,9 @@ function showFoundNotAnonymousModal(itemId, verificationQuestions) {
                 <h6><i class="bi bi-arrow-right-circle text-primary me-2"></i>What happens next?</h6>
                 <ul class="mb-0">
                     <li>The reporter will be notified of your claim request</li>
-                    <li>After submitting, the reporter's contact information will be shown to you</li>
-                    <li>The reporter will review your answers and decide whether to accept or deny your claim</li>
-                    <li>You can contact them directly using the provided information</li>
+                    <li>You will receive the reporter's contact information immediately</li>
+                    <li>The reporter must still accept your claim to update the item status</li>
+                    <li>You can contact them using the provided information</li>
                 </ul>
             </div>
         </div>
@@ -609,7 +733,7 @@ function showFoundNotAnonymousModal(itemId, verificationQuestions) {
     
     // Add event listener to the button
     document.getElementById('submitClaimBtn').addEventListener('click', function() {
-        handleFoundItemClaim(itemId, verificationQuestions);
+        handleFoundItemClaim(itemId, verificationQuestions, false);
     });
 }
 
@@ -618,7 +742,7 @@ function showFoundAnonymousModal(itemId, verificationQuestions) {
     const modalBody = document.getElementById('claimModalBody');
     const modalFooter = document.getElementById('claimModalFooter');
     
-    modalTitle.textContent = 'Claim Anonymous Found Item';
+    modalTitle.textContent = 'Claim Found Item';
     
     let questionsHTML = '';
     if (verificationQuestions && verificationQuestions.length > 0) {
@@ -652,20 +776,19 @@ function showFoundAnonymousModal(itemId, verificationQuestions) {
     modalBody.innerHTML = `
         <div class="alert alert-warning">
             <i class="bi bi-shield-lock me-2"></i>
-            The reporter has chosen to remain anonymous.
+            The reporter has chosen to remain anonymous. Their contact information will only be shared if they accept your claim.
         </div>
         
         ${questionsHTML}
         
         <div class="card mt-3">
             <div class="card-body">
-                <h6><i class="bi bi-arrow-right-circle text-primary me-2"></i>Anonymous Claim Process</h6>
+                <h6><i class="bi bi-arrow-right-circle text-primary me-2"></i>What happens next?</h6>
                 <ul class="mb-0">
                     <li>The reporter will be notified of your claim request</li>
                     <li>Your answers will be sent to them for review</li>
                     <li>If they accept your claim, you'll receive their contact information</li>
-                    <li>If they decline, you'll be notified without revealing their identity</li>
-                    <li>Contact information will only be shared if the reporter agrees</li>
+                    <li>If they reject your claim, you'll be notified without revealing their identity</li>
                 </ul>
             </div>
         </div>
@@ -680,7 +803,7 @@ function showFoundAnonymousModal(itemId, verificationQuestions) {
     
     // Add event listener to the button
     document.getElementById('submitAnonymousClaimBtn').addEventListener('click', function() {
-        handleAnonymousFoundItemClaim(itemId, verificationQuestions);
+        handleFoundItemClaim(itemId, verificationQuestions, true);
     });
 }
 
@@ -703,46 +826,142 @@ function handleItemAction() {
     // Show the claim modal
     showClaimModal(itemId, status, reportType, isAnonymous, verificationQuestions);
 }
-// HANDLING FUNCTIONS
-// HANDLING FUNCTIONS
-async function handleLostItemFound(itemId) {
-    try {
-       const response = await fetch(`/lost_and_foundapi/report_found/${itemId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCsrfToken()
-            },
-            body: JSON.stringify({
-                action: 'found_lost_item'
-            })
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-            // Close modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('claimModal'));
-            modal.hide();
+
+// Show contact info modal - UPDATED FOR BETTER DISPLAY
+function showContactInfoModal(contactInfo, title = "Contact Information") {
+    const modal = document.getElementById('contactInfoModal');
+    const content = document.getElementById('contactInfoContent');
+    
+    content.innerHTML = `
+        <div class="contact-info-container">
+            <div class="contact-info-header">
+                <i class="bi bi-person-circle contact-icon-large"></i>
+                <h5 class="contact-name mb-2">${contactInfo.name}</h5>
+                <div class="contact-badge">Reporter / Owner</div>
+            </div>
             
-            // Show contact info
-            alert(`Contact Information:\n\n${data.contact_info || "Contact information will be provided by the reporter."}\n\nThey have been notified.`);
+            <div class="contact-info-items">
+                <div class="contact-info-item">
+                    <div class="contact-icon-small contact-icon-email">
+                        <i class="bi bi-envelope"></i>
+                    </div>
+                    <div>
+                        <div class="contact-label">Email</div>
+                        <div class="contact-value">
+                            <a href="mailto:${contactInfo.email}" class="text-decoration-none">${contactInfo.email}</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="contact-info-item">
+                    <div class="contact-icon-small contact-icon-phone">
+                        <i class="bi bi-phone"></i>
+                    </div>
+                    <div>
+                        <div class="contact-label">Phone</div>
+                        <div class="contact-value">
+                            <a href="tel:${contactInfo.phone}" class="text-decoration-none">${contactInfo.phone}</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
             
-            // Update UI
-            updateUIAfterAction();
-        } else {
-            throw new Error(data.error || "Failed to notify reporter");
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        alert("Failed to notify reporter: " + error.message);
+            <div class="contact-info-footer">
+                <div class="alert alert-info mt-3 mb-0">
+                    <i class="bi bi-info-circle me-2"></i>
+                    Please contact them to arrange the return/pickup of the item.
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Update modal title
+    const modalTitle = modal.querySelector('.modal-title');
+    if (modalTitle) {
+        modalTitle.textContent = title;
     }
+    
+    // Show the modal
+    const bsModal = new bootstrap.Modal(modal);
+    bsModal.show();
 }
 
-async function handleAnonymousLostItemFound(itemId) {
-    const message = document.getElementById('messageToReporter')?.value || '';
+// Show success message modal
+// Show success message modal - UPDATED VERSION
+function showSuccessModal(message, title = "Success!", showAdditionalInfo = true) {
+    const modal = document.getElementById('successModal');
+    const content = document.getElementById('successMessageContent');
+    const titleElement = modal.querySelector('#successModalTitle');
+    const additionalInfo = modal.querySelector('#successAdditionalInfo');
     
+    // Set message content
+    if (typeof message === 'string') {
+        content.innerHTML = `<p class="text-muted mb-0">${message}</p>`;
+    } else if (typeof message === 'object') {
+        // Handle structured message
+        let html = '';
+        if (message.title) {
+            html += `<h6 class="fw-bold">${message.title}</h6>`;
+        }
+        if (message.text) {
+            html += `<p class="text-muted mb-0">${message.text}</p>`;
+        }
+        content.innerHTML = html;
+    }
+    
+    // Set title
+    if (titleElement) {
+        titleElement.textContent = title;
+    }
+    
+    // Show/hide additional info
+    if (additionalInfo) {
+        additionalInfo.style.display = showAdditionalInfo ? 'block' : 'none';
+    }
+    
+    // Show the modal
+    const bsModal = new bootstrap.Modal(modal);
+    bsModal.show();
+}
+
+function showSuccessMessage(message, title = "Success") {
+    const modal = document.getElementById('successModal');
+    const content = document.getElementById('successMessageContent');
+    
+    content.innerHTML = `
+        <div class="text-center py-4">
+            <div class="success-icon mb-3">
+                <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+            </div>
+            <h5 class="mb-3">${title}</h5>
+            <p class="mb-0">${message}</p>
+        </div>
+    `;
+    
+    // Update modal title
+    const modalTitle = modal.querySelector('.modal-title');
+    if (modalTitle) {
+        modalTitle.textContent = title;
+    }
+    
+    // Show the modal
+    const bsModal = new bootstrap.Modal(modal);
+    bsModal.show();
+}
+
+// HANDLING FUNCTIONS - CORRECTED LOGIC
+async function handleLostItemFound(itemId) {
     try {
+        // Collect optional contact info
+        const claimantPhone = document.getElementById('claimantPhone')?.value || '';
+        const claimantEmail = document.getElementById('claimantEmail')?.value || '';
+        const claimantAdditionalInfo = document.getElementById('claimantAdditionalInfo')?.value || '';
+        
+        const claimantContactInfo = {};
+        if (claimantPhone) claimantContactInfo.phone = claimantPhone;
+        if (claimantEmail) claimantContactInfo.email = claimantEmail;
+        if (claimantAdditionalInfo) claimantContactInfo.additional_info = claimantAdditionalInfo;
+        
         const response = await fetch(`/lost_and_found/api/report_found/${itemId}`, {
             method: 'POST',
             headers: {
@@ -750,78 +969,23 @@ async function handleAnonymousLostItemFound(itemId) {
                 'X-CSRFToken': getCsrfToken()
             },
             body: JSON.stringify({
-                action: 'found_lost_item_anonymous',
-                message: message
+                action: 'found_lost_item',
+                claimant_contact_info: Object.keys(claimantContactInfo).length > 0 ? claimantContactInfo : undefined
             })
         });
         
         const data = await response.json();
         
         if (response.ok) {
-            // Close modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('claimModal'));
-            modal.hide();
+            // Close claim modal
+            const claimModal = bootstrap.Modal.getInstance(document.getElementById('claimModal'));
+            claimModal.hide();
             
-            // Show confirmation
-            alert("Your secure message has been sent to the reporter. They will review it and decide whether to contact you. You'll be notified if they respond.");
-            
-            // Update UI
-            updateUIAfterAction();
-        } else {
-            throw new Error(data.error || "Failed to send message");
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        alert("Failed to send message: " + error.message);
-    }
-}
-
-async function handleFoundItemClaim(itemId, verificationQuestions) {
-    console.log(`handleFoundItemClaim called for itemId=${itemId}`);
-    // Collect answers
-    const answers = {};
-    if (verificationQuestions && verificationQuestions.length > 0) {
-        verificationQuestions.forEach((question, index) => {
-            const answer = document.getElementById(`question_${index}`)?.value;
-            if (!answer) {
-                alert(`Please answer question ${index + 1}: "${question}"`);
-                return;
-            }
-            answers[`question_${index + 1}`] = answer;
-        });
-    } else {
-        const details = document.getElementById('claimDetails')?.value || '';
-        if (details) {
-            answers.additional_details = details;
-        }
-    }
-    console.log(answers);
-    
-    try {
-        const response = await fetch(`/lost_and_found/api/claim/${itemId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCsrfToken()
-            },
-            body: JSON.stringify({
-                action: 'claim_found_item',
-                verification_answers: answers
-            })
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-            // Close modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('claimModal'));
-            modal.hide();
-            
-            // Show reporter contact info (for non-anonymous)
-            if (data.contact_info) {
-                alert(`Claim request submitted successfully!\n\nReporter's Contact Information:\n${data.contact_info}\n\nThey have been notified and will review your claim.`);
+            // Show contact info in styled modal
+            if (data.reporter_contact_info) {
+                showContactInfoModal(data.reporter_contact_info, "Owner's Contact Information");
             } else {
-                alert("Claim request submitted successfully! The reporter has been notified and will review your claim.");
+                showSuccessMessage("The owner has been notified and will contact you shortly.");
             }
             
             // Update UI
@@ -835,14 +999,19 @@ async function handleFoundItemClaim(itemId, verificationQuestions) {
     }
 }
 
-async function handleAnonymousFoundItemClaim(itemId, verificationQuestions) {
+async function handleFoundItemClaim(itemId, verificationQuestions, isAnonymous) {
+    console.log(`handleFoundItemClaim called for itemId=${itemId}`);
+    
     // Collect answers
     const answers = {};
+    let hasErrors = false;
+    
     if (verificationQuestions && verificationQuestions.length > 0) {
         verificationQuestions.forEach((question, index) => {
             const answer = document.getElementById(`question_${index}`)?.value;
-            if (!answer) {
+            if (!answer || answer.trim() === '') {
                 alert(`Please answer question ${index + 1}: "${question}"`);
+                hasErrors = true;
                 return;
             }
             answers[`question_${index + 1}`] = answer;
@@ -853,9 +1022,13 @@ async function handleAnonymousFoundItemClaim(itemId, verificationQuestions) {
             answers.additional_details = details;
         }
     }
+    console.log('Collected answers:', answers);
+    console.log('Has errors:', hasErrors);
+
+    
+    if (hasErrors) return;
     
     try {
-        // FIXED: Added /api/ to the URL
         const response = await fetch(`/lost_and_found/api/claim/${itemId}`, {
             method: 'POST',
             headers: {
@@ -863,20 +1036,37 @@ async function handleAnonymousFoundItemClaim(itemId, verificationQuestions) {
                 'X-CSRFToken': getCsrfToken()
             },
             body: JSON.stringify({
-                action: 'claim_found_item_anonymous',
-                verification_answers: answers
+                verification_answers: Object.keys(answers).length > 0 ? answers : undefined
             })
         });
         
         const data = await response.json();
         
         if (response.ok) {
-            // Close modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('claimModal'));
-            modal.hide();
+            // Close claim modal
+            const claimModal = bootstrap.Modal.getInstance(document.getElementById('claimModal'));
+            claimModal.hide();
             
-            // Show confirmation
-            alert("Claim request submitted successfully! The reporter has been notified. If they accept your claim, their contact information will be provided to you.");
+            // Handle response based on anonymity
+            if (!isAnonymous && data.reporter_contact_info) {
+                // Non-anonymous report - show contact info immediately
+                showContactInfoModal(data.reporter_contact_info, "Reporter's Contact Information");
+            } else if (isAnonymous) {
+                // Anonymous report - show success message WITHOUT contact info
+                showSuccessModal(
+        "Your claim request has been submitted successfully! " +
+        "The reporter has been notified and will review your claim. " +
+        "If they accept your claim, you'll receive their contact information.",
+        "Claim Submitted",
+        true
+    );
+            } else {
+                // Non-anonymous but no contact info (fallback)
+                showSuccessMessage(
+                    data.message || "Claim request submitted successfully!",
+                    "Claim Submitted"
+                );
+            }
             
             // Update UI
             updateUIAfterAction();
@@ -888,11 +1078,12 @@ async function handleAnonymousFoundItemClaim(itemId, verificationQuestions) {
         alert("Failed to submit claim: " + error.message);
     }
 }
+
 function updateUIAfterAction() {
     const btn = document.getElementById('claim-btn');
     if (btn) {
         btn.disabled = true;
-        btn.innerHTML = '<i class="bi bi-clock me-2"></i>Action Taken - Pending';
+        btn.innerHTML = '<i class="bi bi-clock me-2"></i>Claim Submitted - Pending';
         btn.classList.remove('btn-success');
         btn.classList.add('btn-secondary');
     }
@@ -918,5 +1109,97 @@ document.addEventListener('DOMContentLoaded', function() {
         else if (e.key === 'ArrowRight') navigateImages(1);
     });
 });
+
+// Add CSS for contact info modal
+const style = document.createElement('style');
+style.textContent = `
+.contact-info-container {
+    padding: 1rem;
+}
+
+.contact-info-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.contact-icon-large {
+    font-size: 3rem;
+    color: var(--primary-color, #3b82f6);
+    margin-bottom: 1rem;
+}
+
+.contact-name {
+    font-weight: 600;
+    color: #333;
+}
+
+.contact-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.contact-info-items {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.contact-info-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.contact-info-item:last-child {
+    border-bottom: none;
+}
+
+.contact-icon-small {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.contact-icon-email {
+    background-color: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+.contact-icon-phone {
+    background-color: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+}
+
+.contact-label {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+}
+
+.contact-value {
+    font-weight: 500;
+    color: #333;
+}
+
+.contact-info-footer {
+    margin-top: 1.5rem;
+}
+
+.success-icon {
+    font-size: 4rem;
+}
+`;
+document.head.appendChild(style);
 </script>
 {% endblock %}
