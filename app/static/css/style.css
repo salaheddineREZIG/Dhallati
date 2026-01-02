@@ -43,6 +43,51 @@
 }
 
 
+/* Fix for notifications dropdown positioning */
+.notification-dropdown {
+    right: 0 !important;
+    left: auto !important;
+    transform: translateX(0) !important;
+    min-width: 380px;
+    max-width: 380px;
+}
+
+@media (max-width: 768px) {
+    .notification-dropdown {
+        position: fixed !important;
+        top: 60px !important;
+        right: 10px !important;
+        left: 10px !important;
+        min-width: calc(100vw - 20px) !important;
+        max-width: calc(100vw - 20px) !important;
+        margin: 0 !important;
+    }
+}
+
+/* Ensure dropdown doesn't go off-screen */
+.dropdown-menu-end {
+    right: 0 !important;
+    left: auto !important;
+}
+
+/* Make sure parent dropdown container is positioned correctly */
+.dropdown {
+    position: relative;
+}
+
+/* Fix for notification list scrolling */
+#notificationList {
+    max-height: 300px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Ensure dropdown items don't overflow */
+.dropdown-item {
+    white-space: normal !important;
+    word-wrap: break-word !important;
+}
+
 
 
 
@@ -1168,4 +1213,654 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
     background: var(--primary-light);
+}
+
+/* Add these styles to your existing style.css file */
+
+/* ===== IMPROVED NAVBAR ===== */
+.navbar-glass {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px) !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08) !important;
+    transition: all 0.3s ease !important;
+}
+
+.dark-theme .navbar-glass {
+    background: rgba(10, 10, 10, 0.95) !important;
+    border-bottom: 1px solid rgba(255, 215, 0, 0.15) !important;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+.navbar-brand-glow {
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.navbar-brand-glow:hover {
+    transform: scale(1.05);
+    text-shadow: 0 0 20px rgba(var(--primary-rgb), 0.3);
+}
+
+.navbar-toggler-custom {
+    border: none !important;
+    padding: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.navbar-toggler-custom:focus {
+    box-shadow: none !important;
+}
+
+.navbar-toggler-custom .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='currentColor' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+.dark-theme .navbar-toggler-custom .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23FFD700' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+.nav-link-enhanced {
+    color: var(--text-primary) !important;
+    font-weight: 500;
+    padding: 0.5rem 1rem !important;
+    border-radius: 8px;
+    margin: 0 0.25rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-link-enhanced:hover {
+    color: var(--primary-color) !important;
+    transform: translateY(-2px);
+}
+
+.nav-link-enhanced::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.nav-link-enhanced:hover::before {
+    width: 80%;
+}
+
+.nav-link-enhanced.active {
+    color: var(--primary-color) !important;
+    background: rgba(var(--primary-rgb), 0.1);
+}
+
+.nav-link-enhanced.active::before {
+    width: 80%;
+}
+
+.dark-theme .nav-link-enhanced {
+    color: #f8f8f8 !important;
+}
+
+.dark-theme .nav-link-enhanced:hover {
+    color: var(--primary-color) !important;
+    background: rgba(255, 215, 0, 0.1);
+}
+
+/* ===== ENHANCED NOTIFICATIONS DROPDOWN ===== */
+.notification-dropdown {
+    min-width: 380px !important;
+    max-height: 500px !important;
+    overflow-y: auto;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
+    animation: slideDown 0.3s ease-out !important;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.notification-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light)) !important;
+    color: white !important;
+    padding: 1rem 1.5rem !important;
+    border-bottom: none !important;
+}
+
+.dark-theme .notification-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)) !important;
+}
+
+.notification-item-enhanced {
+    padding: 1rem 1.5rem !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    transition: all 0.3s ease !important;
+    cursor: pointer;
+}
+
+.notification-item-enhanced:hover {
+    background: rgba(var(--primary-rgb), 0.05) !important;
+    transform: translateX(5px);
+}
+
+.dark-theme .notification-item-enhanced:hover {
+    background: rgba(255, 215, 0, 0.1) !important;
+}
+
+.notification-item-enhanced.unread {
+    background: rgba(var(--primary-rgb), 0.08) !important;
+    border-left: 3px solid var(--primary-color) !important;
+}
+
+.dark-theme .notification-item-enhanced.unread {
+    background: rgba(255, 215, 0, 0.15) !important;
+}
+
+.notification-icon-wrapper {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    background: rgba(var(--primary-rgb), 0.1);
+    transition: all 0.3s ease;
+}
+
+.dark-theme .notification-icon-wrapper {
+    background: rgba(255, 215, 0, 0.15);
+}
+
+.notification-item-enhanced:hover .notification-icon-wrapper {
+    transform: scale(1.1);
+    background: rgba(var(--primary-rgb), 0.2);
+}
+
+.dark-theme .notification-item-enhanced:hover .notification-icon-wrapper {
+    background: rgba(255, 215, 0, 0.25);
+}
+
+.notification-time {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.notification-badge-pulse {
+    animation: pulse 2s infinite;
+    box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0.7);
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(var(--primary-rgb), 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0);
+    }
+}
+
+/* ===== ENHANCED ANIMATIONS ===== */
+.fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15) !important;
+}
+
+.dark-theme .hover-lift:hover {
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* ===== PROFILE DROPDOWN ===== */
+.profile-dropdown {
+    min-width: 200px !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+}
+
+.dark-theme .profile-dropdown {
+    background: rgba(17, 17, 17, 0.95) !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+.profile-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid var(--primary-color);
+    padding: 2px;
+    transition: all 0.3s ease;
+}
+
+.profile-avatar:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.3);
+}
+
+/* ===== RESPONSIVE ADJUSTMENTS ===== */
+@media (max-width: 768px) {
+    .notification-dropdown {
+        min-width: 300px !important;
+        max-width: 90vw !important;
+        position: fixed !important;
+        top: 60px !important;
+        right: 5px !important;
+        left: 5px !important;
+        margin: 0 auto !important;
+    }
+    
+    .navbar-glass {
+        padding: 0.5rem 0 !important;
+    }
+}
+
+/* ===== SCROLLBAR STYLING ===== */
+.notification-dropdown::-webkit-scrollbar {
+    width: 6px;
+}
+
+.notification-dropdown::-webkit-scrollbar-track {
+    background: var(--surface-color);
+}
+
+.notification-dropdown::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 3px;
+}
+
+.notification-dropdown::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-light);
+}
+
+/* ===== LOADING ANIMATIONS ===== */
+.loading-pulse {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+.spin-animation {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* ===== BADGE ANIMATIONS ===== */
+.badge-pulse {
+    animation: badgePulse 2s infinite;
+}
+
+@keyframes badgePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+/* ===== CARD ENTRANCE ANIMATIONS ===== */
+.card-entrance {
+    animation: cardEntrance 0.6s ease-out;
+}
+
+@keyframes cardEntrance {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ===== BUTTON ENHANCEMENTS ===== */
+.btn-glow {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-glow::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.1) 50%,
+        transparent 70%
+    );
+    transform: rotate(45deg);
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: rotate(45deg) translateX(-100%); }
+    100% { transform: rotate(45deg) translateX(100%); }
+}
+/* Add this to your style.css - FIXED THEME VARIABLES */
+
+/* Ensure body background is properly set */
+body.light-theme {
+    background-color: #ffffff !important;
+}
+
+body.dark-theme {
+    background-color: #0a0a0a !important;
+    color: #f8f8f8 !important;
+}
+
+/* Fix for dark theme card backgrounds */
+.dark-theme .card {
+    background-color: #111111 !important;
+    border-color: #333333 !important;
+    color: #f8f8f8 !important;
+}
+
+.dark-theme .card-body {
+    background-color: transparent !important;
+}
+
+/* Fix for form elements in dark theme */
+.dark-theme .form-control,
+.dark-theme .form-select,
+.dark-theme .input-group-text {
+    background-color: #111111 !important;
+    border-color: #333333 !important;
+    color: #f8f8f8 !important;
+}
+
+.dark-theme .form-control:focus,
+.dark-theme .form-select:focus {
+    background-color: #111111 !important;
+    color: #f8f8f8 !important;
+    border-color: var(--primary-color) !important;
+}
+
+/* Fix for navbar in dark theme */
+.dark-theme .navbar-glass {
+    background-color: rgba(10, 10, 10, 0.95) !important;
+}
+
+.dark-theme .nav-link {
+    color: #f8f8f8 !important;
+}
+
+/* Fix for dropdowns in dark theme */
+.dark-theme .dropdown-menu {
+    background-color: #111111 !important;
+    border-color: #333333 !important;
+}
+
+.dark-theme .dropdown-item {
+    color: #f8f8f8 !important;
+}
+
+.dark-theme .dropdown-item:hover {
+    background-color: #333333 !important;
+}
+
+/* Fix for badges in dark theme */
+.dark-theme .badge.bg-primary {
+    background-color: var(--primary-color) !important;
+    color: #000000 !important;
+}
+
+/* Fix for buttons in dark theme */
+.dark-theme .btn-outline-primary {
+    color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+}
+
+.dark-theme .btn-outline-primary:hover {
+    background-color: var(--primary-color) !important;
+    color: #000000 !important;
+}
+
+/* Fix for text colors in dark theme */
+.dark-theme .text-muted {
+    color: #a0a0a0 !important;
+}
+
+.dark-theme .text-primary {
+    color: var(--primary-color) !important;
+}
+
+/* Fix for search card in dark theme */
+.dark-theme .search-card {
+    background-color: #111111 !important;
+}
+
+
+/* Fix navbar covering content */
+.main-content {
+    padding-top: 80px; /* Adjust based on your navbar height */
+    min-height: calc(100vh - 80px);
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        padding-top: 70px;
+    }
+}
+
+/* Adjust navbar for fixed positioning */
+.navbar-glass {
+    backdrop-filter: blur(10px) !important;
+    border-bottom: 1px solid var(--glass-border) !important;
+    z-index: 1030;
+}
+
+/* Fix for item detail page specifically */
+.py-4 {
+    padding-top: 6rem !important;
+}
+
+
+
+
+/* DARK THEME FIXES */
+
+/* Fix white cards in dark theme */
+.dark-theme .card {
+    background-color: #1a1a1a !important;
+    border-color: #333 !important;
+    color: #e0e0e0 !important;
+}
+
+.dark-theme .card-header {
+    background-color: #222 !important;
+    border-bottom-color: #333 !important;
+    color: #e0e0e0 !important;
+}
+
+.dark-theme .card-body {
+    background-color: transparent !important;
+}
+
+/* Fix white backgrounds in alerts */
+.dark-theme .alert {
+    background-color: #2a2a2a !important;
+    border-color: #444 !important;
+    color: #e0e0e0 !important;
+}
+
+.dark-theme .alert-info {
+    background-color: rgba(13, 110, 253, 0.2) !important;
+    border-color: rgba(13, 110, 253, 0.3) !important;
+}
+
+.dark-theme .alert-success {
+    background-color: rgba(25, 135, 84, 0.2) !important;
+    border-color: rgba(25, 135, 84, 0.3) !important;
+}
+
+.dark-theme .alert-warning {
+    background-color: rgba(255, 193, 7, 0.2) !important;
+    border-color: rgba(255, 193, 7, 0.3) !important;
+}
+
+/* Fix form controls in dark theme */
+.dark-theme .form-control,
+.dark-theme .form-select,
+.dark-theme .input-group-text {
+    background-color: #222 !important;
+    border-color: #444 !important;
+    color: #e0e0e0 !important;
+}
+
+.dark-theme .form-control:focus,
+.dark-theme .form-select:focus {
+    background-color: #222 !important;
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 0.25rem rgba(255, 215, 0, 0.25) !important;
+}
+
+/* Fix dropdowns */
+.dark-theme .dropdown-menu {
+    background-color: #222 !important;
+    border-color: #444 !important;
+}
+
+.dark-theme .dropdown-item {
+    color: #e0e0e0 !important;
+}
+
+.dark-theme .dropdown-item:hover {
+    background-color: #333 !important;
+}
+
+/* Fix modal in dark theme */
+.dark-theme .modal-content {
+    background-color: #222 !important;
+    border-color: #444 !important;
+    color: #e0e0e0 !important;
+}
+
+.dark-theme .modal-header {
+    border-bottom-color: #444 !important;
+}
+
+.dark-theme .modal-footer {
+    border-top-color: #444 !important;
+}
+
+/* Fix buttons in dark theme */
+.dark-theme .btn-outline-primary {
+    color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+}
+
+.dark-theme .btn-outline-primary:hover {
+    background-color: var(--primary-color) !important;
+    color: #000 !important;
+}
+
+.dark-theme .btn-secondary {
+    background-color: #444 !important;
+    border-color: #555 !important;
+    color: #e0e0e0 !important;
+}
+
+/* Fix text colors */
+.dark-theme .text-muted {
+    color: #aaa !important;
+}
+
+.dark-theme .text-secondary {
+    color: #bbb !important;
+}
+
+/* Fix info-card in dark theme */
+.dark-theme .info-card {
+    background: #222 !important;
+}
+
+/* Fix contact-card in dark theme */
+.dark-theme .contact-card {
+    background: linear-gradient(135deg, #222, #2a2a2a) !important;
+    border-color: #444 !important;
+}
+
+/* Fix badge colors */
+.dark-theme .badge.bg-light {
+    background-color: #444 !important;
+    color: #e0e0e0 !important;
+}
+
+/* Fix table colors */
+.dark-theme table {
+    color: #e0e0e0 !important;
+}
+
+.dark-theme .table {
+    --bs-table-bg: transparent;
+    --bs-table-striped-bg: rgba(255, 255, 255, 0.05);
+    --bs-table-hover-bg: rgba(255, 255, 255, 0.075);
+}
+
+/* Fix hr and borders */
+.dark-theme hr {
+    border-color: #444 !important;
+    opacity: 0.5;
+}
+
+/* Fix close buttons */
+.dark-theme .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* Fix thumbnails in image gallery */
+.dark-theme .thumbnail {
+    border-color: #444 !important;
+}
+
+.dark-theme .thumbnail:hover {
+    border-color: var(--primary-color) !important;
+}
+
+/* Fix dropdown toggle */
+.dark-theme .dropdown-toggle {
+    color: #e0e0e0 !important;
 }

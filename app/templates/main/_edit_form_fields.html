@@ -168,6 +168,166 @@
     <div class="form-text">10-digit phone number starting with 0</div>
 </div>
 
+<style>
+/* Theme-aware styles for the form */
+:root {
+    --primary-color: #3b82f6;
+    --primary-light: #60a5fa;
+    --primary-dark: #1d4ed8;
+    --primary-rgb: 59, 130, 246;
+    --secondary-color: #f8f9fa;
+    --background-color: #ffffff;
+    --surface-color: #ffffff;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --border-color: #e2e8f0;
+    --danger-color: #dc3545;
+}
+
+.dark-theme {
+    --primary-color: #FFD700;
+    --primary-light: #FFE55C;
+    --primary-dark: #B8860B;
+    --primary-rgb: 255, 215, 0;
+    --secondary-color: #000000;
+    --background-color: #0a0a0a;
+    --surface-color: #111111;
+    --text-primary: #f8f8f8;
+    --text-secondary: #a0a0a0;
+    --border-color: #333333;
+    --danger-color: #dc3545;
+}
+
+/* Fix form controls */
+.form-control,
+.form-select,
+.form-check-input,
+input[type="datetime-local"] {
+    background-color: var(--background-color) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.form-control:focus,
+.form-select:focus,
+input[type="datetime-local"]:focus {
+    background-color: var(--background-color) !important;
+    border-color: var(--primary-color) !important;
+    color: var(--text-primary) !important;
+    box-shadow: 0 0 0 0.25rem rgba(var(--primary-rgb), 0.25) !important;
+}
+
+.form-control:disabled,
+.form-control[readonly],
+.form-select:disabled,
+.form-check-input:disabled,
+input[type="datetime-local"]:disabled {
+    background-color: var(--surface-color) !important;
+    opacity: 0.7 !important;
+    cursor: not-allowed !important;
+}
+
+/* Fix form labels */
+.form-label {
+    color: var(--text-primary) !important;
+    font-weight: 500;
+}
+
+.form-check-label {
+    color: var(--text-primary) !important;
+}
+
+/* Fix form text */
+.form-text {
+    color: var(--text-secondary) !important;
+}
+
+/* Fix alert */
+.alert {
+    background-color: rgba(var(--primary-rgb), 0.1);
+    border-color: rgba(var(--primary-rgb), 0.2);
+    color: var(--text-primary);
+}
+
+.alert-danger {
+    background-color: rgba(220, 53, 69, 0.2);
+    border-color: rgba(220, 53, 69, 0.3);
+}
+
+/* Fix badges */
+.badge {
+    color: white;
+}
+
+.badge-warning {
+    background-color: #ffc107;
+}
+
+.badge-success {
+    background-color: #28a745;
+}
+
+/* Fix existing images border */
+.rounded.border {
+    border-color: var(--border-color) !important;
+}
+
+/* Fix text colors */
+.text-muted {
+    color: var(--text-secondary) !important;
+}
+
+.text-danger {
+    color: var(--danger-color) !important;
+}
+
+/* Fix form control plain text */
+.form-control-plaintext {
+    color: var(--text-primary) !important;
+}
+
+/* Fix form switch */
+.form-switch .form-check-input {
+    background-color: var(--surface-color);
+    border-color: var(--border-color);
+}
+
+.form-switch .form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Fix placeholder text */
+::placeholder {
+    color: var(--text-secondary) !important;
+    opacity: 0.7 !important;
+}
+
+/* Fix existing image checkbox */
+.existing-image .form-check-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+/* Fix disabled/readonly styling */
+input:disabled,
+textarea:disabled,
+select:disabled,
+input[readonly],
+textarea[readonly] {
+    background-color: var(--surface-color) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-secondary) !important;
+    cursor: not-allowed !important;
+}
+
+/* Fix small text */
+.small {
+    color: var(--text-secondary);
+}
+</style>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const anonymousSwitch = document.getElementById('{{ form.is_anonymous.id }}');
@@ -179,11 +339,11 @@ document.addEventListener('DOMContentLoaded', function() {
             if (anonymousSwitch.checked && "{{ report.report_type }}" === 'found') {
                 // For found reports, if anonymous, contact info should be readonly
                 contactInfoField.setAttribute('readonly', true);
-                contactInfoField.style.backgroundColor = '#f8f9fa';
+                contactInfoField.classList.add('form-control-disabled');
             } else {
                 // Otherwise, make it editable
                 contactInfoField.removeAttribute('readonly');
-                contactInfoField.style.backgroundColor = '';
+                contactInfoField.classList.remove('form-control-disabled');
             }
         }
     }
@@ -199,17 +359,39 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add custom styling for disabled state
     const style = document.createElement('style');
     style.textContent = `
+        .form-control-disabled {
+            background-color: var(--surface-color) !important;
+            cursor: not-allowed !important;
+        }
+        
         #{{ form.verification_question.id }}:disabled,
         #{{ form.is_anonymous.id }}:disabled {
-            background-color: #f8f9fa;
-            cursor: not-allowed;
-            opacity: 0.7;
+            background-color: var(--surface-color) !important;
+            cursor: not-allowed !important;
+            opacity: 0.7 !important;
         }
-        #{{ form.contact_info.id }}[readonly] {
-            background-color: #f8f9fa;
-            cursor: not-allowed;
+        
+        /* Ensure form inputs have proper focus states in dark mode */
+        .dark-theme .form-control:focus,
+        .dark-theme .form-select:focus,
+        .dark-theme input[type="datetime-local"]:focus {
+            border-color: var(--primary-color) !important;
+            box-shadow: 0 0 0 0.25rem rgba(255, 215, 0, 0.25) !important;
         }
     `;
     document.head.appendChild(style);
+    
+    // Update theme when theme changes
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.attributeName === 'class') {
+                // Re-apply the style when theme changes
+                style.textContent = style.textContent;
+            }
+        });
+    });
+    
+    // Start observing the body for class changes
+    observer.observe(document.body, { attributes: true });
 });
 </script>

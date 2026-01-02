@@ -50,6 +50,118 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    
+    <!-- Improved Theme Toggle Script -->
+    <script>
+    (function() {
+        // Initialize theme
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('dhallati-theme');
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = themeToggle?.querySelector('.theme-icon');
+            const body = document.body;
+            
+            if (!themeToggle || !themeIcon) return;
+            
+            // Set initial theme
+            if (savedTheme === 'dark') {
+                body.classList.add('dark-theme');
+                themeIcon.className = 'bi bi-sun-fill theme-icon';
+            } else {
+                body.classList.remove('dark-theme');
+                localStorage.setItem('dhallati-theme', 'light');
+            }
+        }
+        
+        // Theme toggle handler
+        function setupThemeToggle() {
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = themeToggle?.querySelector('.theme-icon');
+            const body = document.body;
+            
+            if (!themeToggle) return;
+            
+            themeToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                if (body.classList.contains('dark-theme')) {
+                    // Switch to light theme
+                    body.classList.remove('dark-theme');
+                    themeIcon.className = 'bi bi-moon-fill theme-icon';
+                    localStorage.setItem('dhallati-theme', 'light');
+                } else {
+                    // Switch to dark theme
+                    body.classList.add('dark-theme');
+                    themeIcon.className = 'bi bi-sun-fill theme-icon';
+                    localStorage.setItem('dhallati-theme', 'dark');
+                }
+                
+                // Add animation
+                themeToggle.style.transform = 'scale(1.1) rotate(180deg)';
+                setTimeout(() => {
+                    themeToggle.style.transform = '';
+                }, 300);
+                
+                // Update notification icons if they exist
+                updateNotificationIcons();
+            });
+        }
+        
+        // Update notification icons for theme
+        function updateNotificationIcons() {
+            const icons = document.querySelectorAll('.notification-icon');
+            const isDark = document.body.classList.contains('dark-theme');
+            
+            icons.forEach(icon => {
+                const type = icon.dataset.type;
+                icon.className = `bi ${getNotificationIcon(type)} notification-icon ${
+                    isDark ? 'text-warning' : getNotificationIconColor(type)
+                }`;
+            });
+        }
+        
+        // Notification icon helpers
+        function getNotificationIcon(type) {
+            const icons = {
+                'item_found': 'bi-search',
+                'claim_request': 'bi-person-badge',
+                'claim_request_anonymous': 'bi-person-badge-fill',
+                'claim_accepted': 'bi-check-circle',
+                'claim_rejected': 'bi-x-circle',
+                'claim_cancelled': 'bi-slash-circle',
+                'claim_accepted_confirmation': 'bi-check-circle-fill',
+                'item_returned': 'bi-arrow-return-right',
+                'item_claimed': 'bi-hand-thumbs-up',
+                'item_recovered': 'bi-check-square'
+            };
+            return icons[type] || 'bi-bell';
+        }
+        
+        function getNotificationIconColor(type) {
+            const colors = {
+                'item_found': 'text-success',
+                'claim_request': 'text-primary',
+                'claim_request_anonymous': 'text-primary',
+                'claim_accepted': 'text-success',
+                'claim_rejected': 'text-danger',
+                'claim_cancelled': 'text-warning',
+                'claim_accepted_confirmation': 'text-success',
+                'item_returned': 'text-info',
+                'item_claimed': 'text-success',
+                'item_recovered': 'text-success'
+            };
+            return colors[type] || 'text-secondary';
+        }
+        
+        // Initialize everything when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTheme();
+            setupThemeToggle();
+        });
+    })();
+    </script>
+    
     <script src="{{ url_for('static', filename='js/functions.js') }}"></script>
     {% block scripts %}{% endblock %}
 </body>

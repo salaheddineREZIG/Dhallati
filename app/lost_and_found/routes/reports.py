@@ -317,7 +317,7 @@ def report_item(user):
                 )
             
             # Apply status filter (now includes more statuses)
-            if status_filter in ['lost', 'found', 'claimed_pending', 'claimed', 'returned']:
+            if status_filter in ['lost', 'found']:
                 query = query.filter(Item.status == status_filter)
             
             # Apply category filter
@@ -351,6 +351,8 @@ def report_item(user):
             # Serialize items
             serialized_items = []
             for item in items.items:
+                if item.status not in ['lost', 'found']:
+                    continue
                 item_dict = item.to_dict()
                 
                 # Add location_name from the first report

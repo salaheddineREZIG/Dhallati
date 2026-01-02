@@ -4,299 +4,436 @@
 
 {% block extras %}
 <style>
-    /* Additional styles for main page */
-    :root {
-        --primary-color: #3b82f6;
+    /* Additional custom styles */
+    .search-card {
+        border-radius: 20px;
+        overflow: hidden;
+        transition: all 0.3s ease;
     }
     
-    .dark-theme .hero-section .display-5,
-    .dark-theme .hero-section .lead,
-    .dark-theme .hero-section .text-muted {
-        color: white !important;
+    .search-card:hover {
+        transform: translateY(-5px);
     }
     
-    .dark-theme .search-card {
-        background: var(--glass-bg) !important;
-        backdrop-filter: blur(10px) !important;
-        border: 1px solid var(--glass-border) !important;
+    .item-card {
+        transition: all 0.3s ease;
+        border: 1px solid var(--border-color);
     }
     
-    .dark-theme .form-control,
-    .dark-theme .form-select {
-        background-color: rgba(17, 17, 17, 0.8) !important;
-        color: white !important;
-        border-color: var(--glass-border) !important;
+    .item-card:hover {
+        border-color: var(--primary-color);
+        box-shadow: 0 10px 25px rgba(var(--primary-rgb), 0.1);
     }
     
-    .dark-theme .form-control:focus,
-    .dark-theme .form-select:focus {
-        background-color: rgba(17, 17, 17, 0.9) !important;
-        border-color: var(--primary-color) !important;
-        box-shadow: 0 0 0 0.25rem rgba(var(--primary-rgb), 0.25) !important;
+    .dark-theme .item-card:hover {
+        box-shadow: 0 10px 25px rgba(255, 215, 0, 0.15);
     }
     
-    .dark-theme .input-group-text {
-        background-color: rgba(17, 17, 17, 0.8) !important;
-        color: var(--text-primary) !important;
-        border-color: var(--glass-border) !important;
+    .search-card {
+        border-radius: 20px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        background-color: var(--background-color);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
     }
     
-    .dark-theme .btn-outline-primary {
-        border-color: var(--primary-color) !important;
-        color: var(--primary-color) !important;
+    .search-card:hover {
+        transform: translateY(-5px);
     }
     
-    .dark-theme .btn-outline-primary:hover {
-        background: var(--primary-color) !important;
-        color: #000000 !important;
+    .item-card {
+        transition: all 0.3s ease;
+        border: 1px solid var(--border-color);
+        background-color: var(--background-color);
+        color: var(--text-primary);
+    }
+    
+    .item-card:hover {
+        border-color: var(--primary-color);
+        box-shadow: 0 10px 25px rgba(var(--primary-rgb), 0.1);
+    }
+    
+    .dark-theme .item-card:hover {
+        box-shadow: 0 10px 25px rgba(255, 215, 0, 0.15);
+    }
+    
+    .accordion {
+        --bs-accordion-bg: var(--background-color);
+        --bs-accordion-color: var(--text-primary);
+        --bs-accordion-border-color: var(--border-color);
+        --bs-accordion-btn-color: var(--text-primary);
+        --bs-accordion-btn-bg: var(--background-color);
+        --bs-accordion-active-bg: var(--surface-color);
+        --bs-accordion-active-color: var(--primary-color);
+        --bs-accordion-btn-focus-border-color: var(--primary-color);
+        --bs-accordion-btn-focus-box-shadow: 0 0 0 0.25rem rgba(var(--primary-rgb), 0.25);
+    }
+    
+    .accordion-item {
+        background-color: var(--background-color);
+        color: var(--text-primary);
+        border-color: var(--border-color);
+    }
+    
+    .accordion-button {
+        background-color: var(--surface-color);
+        color: var(--text-primary);
+        border: none;
+    }
+    
+    .accordion-button:not(.collapsed) {
+        background-color: var(--surface-color);
+        color: var(--primary-color);
+        box-shadow: inset 0 -1px 0 var(--border-color);
+    }
+    
+    .accordion-button::after {
+        filter: invert(var(--icon-filter, 0));
+    }
+    
+    .dark-theme .accordion-button::after {
+        filter: invert(1);
+    }
+    
+    .accordion-body {
+        background-color: var(--surface-color);
+        color: var(--text-primary);
+        border-top: 1px solid var(--border-color);
+    }
+    
+    .accordion-button:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.25rem rgba(var(--primary-rgb), 0.25);
+    }
+    
+    /* Ensure form controls inside accordion are theme-aware */
+    .accordion-body .form-select,
+    .accordion-body .form-control {
+        background-color: var(--background-color);
+        color: var(--text-primary);
+        border-color: var(--border-color);
+    }
+    
+    .accordion-body .form-select:focus,
+    .accordion-body .form-control:focus {
+        background-color: var(--background-color);
+        color: var(--text-primary);
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.25rem rgba(var(--primary-rgb), 0.25);
+    }
+    
+    /* Fix for accordion header text */
+    .accordion-header .accordion-button {
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    /* Fix for dark theme specifically */
+    .dark-theme .accordion-button {
+        background-color: #111111;
+    }
+    
+    .dark-theme .accordion-body {
+        background-color: #111111;
+    }
+    
+    .dark-theme .accordion-item {
+        background-color: #0a0a0a;
+        border-color: #333333;
     }
 </style>
 {% endblock %}
 
 {% block navbar %}
-<nav class="navbar navbar-expand-lg navbar-theme shadow-sm py-3">
-  <div class="container">
-    <!-- Brand/App Name -->
-    <a class="navbar-brand fw-bold d-flex align-items-center" href="{{ url_for('lost_and_found.lost_and_found_page') }}" 
-       style="color: var(--primary-color);">
-      <i class="bi bi-search me-2 fs-4"></i>
-      <span>Dhallati</span>
-    </a>
-    
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-            aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto align-items-center">
-        <!-- Notifications -->
-        <li class="nav-item dropdown me-3">
-          <a class="nav-link position-relative nav-link-theme" href="#" id="notificationDropdown" role="button" 
-             data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="bi bi-bell fs-5"></i>
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
-                  id="notificationBadge" style="display: none;">
-              0
-            </span>
-          </a>
-          
-          <ul class="dropdown-menu dropdown-menu-end p-0 theme-dropdown" 
-              style="width: 350px; max-height: 400px; overflow-y: auto;">
-            <li class="dropdown-header theme-dropdown-header d-flex justify-content-between align-items-center py-3">
-              <span class="fw-bold">Notifications</span>
-              <button class="btn btn-sm btn-outline-secondary py-1 px-2" id="markAllReadBtn">
-                Mark all read
-              </button>
-            </li>
-            <li><hr class="dropdown-divider m-0"></li>
-            <div id="notificationList">
-              <!-- Dynamic content -->
-              <div class="text-center py-4 text-muted">
-                <div class="spinner-border spinner-border-sm" role="status">
-                  <span class="visually-hidden">Loading...</span>
-                </div>
-                <p class="mb-0 mt-2">Loading notifications...</p>
-              </div>
+<!-- Enhanced Glassmorphism Navbar -->
+<nav class="navbar navbar-expand-lg navbar-glass fixed-top">
+    <div class="container">
+        <!-- Brand with Logo -->
+        <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('lost_and_found.lost_and_found_page') }}">
+            <div class="position-relative">
+                <i class="bi bi-search-heart fs-3 navbar-brand-glow"></i>
+                <span class="position-absolute top-0 start-100 translate-middle badge badge-pulse bg-danger" 
+                      style="display: none;" id="notificationBadge">
+                    0
+                </span>
             </div>
-            <li class="dropdown-footer text-center p-2">
-              <a href="{{ url_for('lost_and_found.claims_management') }}" class="text-decoration-none">
-                View all claims
-              </a>
-            </li>
-          </ul>
-        </li>
+            <span class="navbar-brand-glow fs-4 fw-bold">Dhallati</span>
+        </a>
         
-        <!-- User avatar dropdown -->
-        <li class="nav-item dropdown">
-          <a class="nav-link d-flex align-items-center nav-link-theme" href="#" id="userDropdown" role="button" 
-             data-bs-toggle="dropdown" aria-expanded="false">
-            <img src="{{ user.profile_pic if user and user.profile_pic else url_for('static', filename='images/default-avatar.png') }}" 
-                 alt="{{ user.name }}" class="rounded-circle me-2" width="36" height="36" style="object-fit: cover;">
-            <span class="d-none d-md-inline">{{ user.name.split(' ')[0] if user else 'User' }}</span>
-            <i class="bi bi-chevron-down ms-1 small"></i>
-          </a>
-          <ul class="dropdown-menu dropdown-menu-end shadow theme-dropdown" aria-labelledby="userDropdown">
-            <li><a class="dropdown-item" href="{{ url_for('main.profile') }}"><i class="bi bi-person me-2"></i>Profile</a></li>
-            <li><a class="dropdown-item" href="{{ url_for('lost_and_found.new_report') }}"><i class="bi bi-plus-circle me-2"></i>New Report</a></li>
-            <li><a class="dropdown-item" href="{{ url_for('lost_and_found.claims_management') }}"><i class="bi bi-clipboard-check me-2"></i>My Claims</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li>
-              <form action="{{ url_for('auth.logout') }}" method="GET">
-                <button type="submit" class="dropdown-item text-danger">
-                  <i class="bi bi-box-arrow-right me-2"></i>Logout
-                </button>
-              </form>
-            </li>
-          </ul>
-        </li>
-      </ul>
+        <!-- Mobile Toggle -->
+        <button class="navbar-toggler navbar-toggler-custom" type="button" data-bs-toggle="collapse" 
+                data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" 
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <!-- Navbar Content -->
+        <div class="collapse navbar-collapse" id="mainNavbar">
+            <!-- Navigation Links -->
+            <ul class="navbar-nav mx-auto">
+            </ul>
+            
+            <!-- Right Side Actions -->
+            <div class="d-flex align-items-center gap-3">
+                <!-- Notifications Dropdown -->
+                <div class="dropdown">
+                    <a href="#" class="nav-link position-relative p-0" id="notificationDropdown" 
+                       role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-bell fs-5"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger badge-pulse" 
+                              id="notificationCount" style="font-size: 0.6rem; display: none;">
+                            0
+                        </span>
+                    </a>
+                    
+                    <ul class="dropdown-menu dropdown-menu-end notification-dropdown" aria-labelledby="notificationDropdown">
+                        <li class="dropdown-header notification-header d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Notifications</span>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-light" id="markAllReadBtn">
+                                    <i class="bi bi-check-all"></i>
+                                </button>
+                                <button class="btn btn-sm btn-light" id="refreshNotifications">
+                                    <i class="bi bi-arrow-clockwise"></i>
+                                </button>
+                            </div>
+                        </li>
+                        <div id="notificationList" class="py-2">
+                            <div class="text-center py-4 text-muted">
+                                <i class="bi bi-bell-slash fs-3 mb-2 d-block"></i>
+                                <p class="mb-0">No notifications yet</p>
+                                <small class="text-muted">We'll notify you when something happens</small>
+                            </div>
+                        </div>
+                        <li class="dropdown-footer p-3 text-center border-top">
+                            <a href="#" class="text-decoration-none small d-flex align-items-center justify-content-center gap-1">
+                                <i class="bi bi-eye"></i>
+                                View all notifications
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Profile Dropdown -->
+                <div class="dropdown">
+                    <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" 
+                       id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        {% if user.profile_pic %}
+                        <img src="{{ user.profile_pic }}" class="profile-avatar" alt="{{ user.name }}">
+                        {% else %}
+                        <div class="profile-avatar bg-primary text-white d-flex align-items-center justify-content-center">
+                            {{ user.name[0]|upper }}
+                        </div>
+                        {% endif %}
+                        <span class="ms-2 d-none d-md-inline">{{ user.name }}</span>
+                    </a>
+                    
+                    <ul class="dropdown-menu dropdown-menu-end profile-dropdown" aria-labelledby="profileDropdown">
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2" href="{{ url_for('main.profile') }}">
+                                <i class="bi bi-person"></i>
+                                <span>Profile</span>
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li class="dropdown-item d-flex align-items-center gap-2">
+                            <i class="bi bi-gear"></i><a class="nav-link" href="{{ url_for('lost_and_found.claims_management') }}">Claims</a>
+                        </li>
+                        
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form action="{{ url_for('auth.logout') }}" method="GET" class="mb-0">
+                                <button type="submit" class="dropdown-item d-flex align-items-center gap-2 text-danger">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                    <span>Logout</span>
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 </nav>
+
+<!-- Add spacing for fixed navbar -->
+<div style="height: 70px;"></div>
 {% endblock %}
 
 {% block main %}
-<div class="container py-5">
-    <!-- Hero Section -->
-    <div class="row justify-content-center mb-5">
+<div class="container py-4">
+    <!-- Hero Section with Animation -->
+    <div class="row justify-content-center mb-5 fade-in-up">
         <div class="col-lg-10 text-center">
-            <h1 class="display-5 fw-bold mb-3 animate__animated animate__fadeInUp">Find What's Lost, Return What's Found</h1>
-            <p class="lead mb-4 animate__animated animate__fadeInUp animate__delay-1s">
-                Search through lost and found items in your university. Help reunite people with their belongings.
+            <h1 class="display-5 fw-bold mb-3 animate__animated animate__fadeInDown">
+                Find What's <span class="text-primary">Lost</span>, 
+                Return What's <span class="text-success">Found</span>
+            </h1>
+            <p class="lead text-muted mb-4 animate__animated animate__fadeInUp animate__delay-1s">
+                Connect with your university community to reunite lost items with their owners.
             </p>
             
-            <!-- Search Bar -->
-            <div class="card shadow-sm border-0 search-card animate__animated animate__fadeInUp animate__delay-2s">
+            <!-- Enhanced Search Card -->
+            <div class="card search-card border-0 shadow-lg animate__animated animate__fadeInUp animate__delay-2s">
                 <div class="card-body p-4">
-                    <form id="searchForm" class="row g-3">
-                        <div class="col-md-8">
-                            <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="bi bi-search text-muted"></i>
+                    <form id="searchForm" class="row g-3 align-items-end">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Search Items</label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-transparent border-end-0">
+                                    <i class="bi bi-search"></i>
                                 </span>
                                 <input type="text" 
                                        id="searchInput" 
-                                       class="form-control ps-0" 
-                                       placeholder="Search items by name, description, or location..." 
+                                       class="form-control border-start-0 ps-0" 
+                                       placeholder="Search by name, description, or location..." 
                                        aria-label="Search items">
                             </div>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Status</label>
                             <select id="statusFilter" class="form-select">
                                 <option value="">All Status</option>
                                 <option value="lost">Lost</option>
                                 <option value="found">Found</option>
                             </select>
                         </div>
-                        <div class="col-md-2">
-                            <button type="submit" class="btn btn-primary w-100">
-                                <i class="bi bi-search me-1"></i>Search
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-primary w-100 btn-lg hover-lift">
+                                <i class="bi bi-search me-2"></i>Search
                             </button>
                         </div>
-                    </form>
-                    
-                    <!-- Advanced Filters (Collapsible) -->
-                    <div class="mt-3 text-start">
-                        <a class="text-decoration-none" data-bs-toggle="collapse" href="#advancedFilters" role="button">
-                            <small><i class="bi bi-funnel me-1"></i>Advanced Filters</small>
-                        </a>
-                        <div class="collapse mt-2" id="advancedFilters">
-                            <div class="row g-2">
-                                <div class="col-md-4">
-                                    <select id="categoryFilter" class="form-select form-select-sm">
-                                        <option value="">All Categories</option>
-                                        <!-- Categories will be populated dynamically -->
-                                    </select>
-                                </div>
-                                <div class="col-md-4">
-                                    <input type="date" id="dateFilter" class="form-control form-control-sm" placeholder="Date">
-                                </div>
-                                <div class="col-md-4">
-                                    <input type="text" id="locationFilter" class="form-control form-control-sm" placeholder="Location">
+                        
+                        <!-- Advanced Filters -->
+                        <div class="col-12 mt-3">
+                            <div class="accordion" id="advancedFilters">
+                                <div class="accordion-item border-0">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed bg-transparent" type="button" 
+                                                data-bs-toggle="collapse" data-bs-target="#filtersCollapse">
+                                            <i class="bi bi-funnel me-2"></i>Advanced Filters
+                                        </button>
+                                    </h2>
+                                    <div id="filtersCollapse" class="accordion-collapse collapse">
+                                        <div class="accordion-body pt-0">
+                                            <div class="row g-3">
+                                                <div class="col-md-4">
+                                                    <select id="categoryFilter" class="form-select">
+                                                        <option value="">All Categories</option>
+                                                        <!-- Categories will be populated dynamically -->
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <input type="date" id="dateFilter" class="form-control" placeholder="Date">
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <input type="text" id="locationFilter" class="form-control" placeholder="Location">
+                                                </div>
+                                                <div class="col-12">
+                                                    <button type="button" id="clearFilters" class="btn btn-outline-secondary btn-sm">
+                                                        <i class="bi bi-x-circle me-1"></i>Clear Filters
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Quick Stats -->
-    <div class="row mb-5 animate__animated animate__fadeInUp animate__delay-3s">
-        <div class="col-12">
-            <div class="stats-section p-4 rounded-3">
-                <div class="row text-center">
-                    <div class="col-md-3 col-6 mb-3">
-                        <div class="stat-item">
-                            <h3 class="stat-number" id="totalItems">0</h3>
-                            <p class="stat-label">Total Items</p>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-6 mb-3">
-                        <div class="stat-item">
-                            <h3 class="stat-number" id="lostItemsCount">0</h3>
-                            <p class="stat-label">Items Lost</p>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-6 mb-3">
-                        <div class="stat-item">
-                            <h3 class="stat-number" id="foundItemsCount">0</h3>
-                            <p class="stat-label">Items Found</p>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-6 mb-3">
-                        <div class="stat-item">
-                            <h3 class="stat-number" id="reunitedCount">0</h3>
-                            <p class="stat-label">Reunited</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Report New Item CTA -->
-    <div class="text-center mt-4 mb-5 animate__animated animate__fadeInUp animate__delay-4s">
+    <!-- Quick Actions -->
+    <div class="text-center my-5 fade-in-up">
         <p class="text-muted mb-3">Can't find what you're looking for?</p>
-        <a href="{{ url_for('lost_and_found.new_report') }}" class="btn btn-success btn-lg px-4 py-3 shadow-sm pulse-animation">
-            <i class="bi bi-plus-circle me-2"></i>Report New Item
-        </a>
-        <p class="small text-muted mt-2">Report a lost item you're looking for, or a found item you want to return</p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a href="{{ url_for('lost_and_found.new_report') }}" 
+               class="btn btn-success btn-lg px-4 py-3 hover-lift animate__animated animate__pulse animate__infinite animate__slower">
+                <i class="bi bi-plus-circle me-2"></i>Report New Item
+            </a>
+            <a href="#" class="btn btn-outline-primary btn-lg px-4 py-3 hover-lift">
+                <i class="bi bi-question-circle me-2"></i>How It Works
+            </a>
+        </div>
     </div>
     
     <!-- Results Section -->
-    <div class="row animate__animated animate__fadeInUp animate__delay-5s">
+    <div class="row fade-in-up">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="h4 mb-0">Recent Items</h2>
+                <div>
+                    <h2 class="h3 mb-0">Recent Items</h2>
+                </div>
                 <div class="btn-group" role="group">
                     <input type="radio" class="btn-check" name="itemType" id="allItems" autocomplete="off" checked>
-                    <label class="btn btn-outline-primary" for="allItems">All</label>
-                    
+                    <label class="btn btn-outline-primary" for="allItems">
+                        <i class="bi bi-grid me-1"></i>All
+                    </label>
                     <input type="radio" class="btn-check" name="itemType" id="lostItems" autocomplete="off">
-                    <label class="btn btn-outline-danger" for="lostItems">Lost</label>
-                    
+                    <label class="btn btn-outline-danger" for="lostItems">
+                        <i class="bi bi-exclamation-circle me-1"></i>Lost
+                    </label>
                     <input type="radio" class="btn-check" name="itemType" id="foundItems" autocomplete="off">
-                    <label class="btn btn-outline-success" for="foundItems">Found</label>
+                    <label class="btn btn-outline-success" for="foundItems">
+                        <i class="bi bi-check-circle me-1"></i>Found
+                    </label>
                 </div>
             </div>
             
             <!-- Items Grid -->
             <div id="itemsGrid" class="row g-4">
                 <!-- Items will be loaded here dynamically -->
-                <div class="col-12 text-center py-5">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <p class="text-muted mt-2">Loading items...</p>
-                </div>
             </div>
             
             <!-- Loading Spinner -->
             <div id="loadingSpinner" class="text-center py-5 d-none">
-                <div class="spinner-border text-primary" role="status">
+                <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
                     <span class="visually-hidden">Loading...</span>
                 </div>
-                <p class="text-muted mt-2">Loading more items...</p>
+                <p class="text-muted mt-3">Loading more items...</p>
             </div>
             
             <!-- No Results Message -->
             <div id="noResults" class="text-center py-5 d-none">
-                <div class="mb-3">
-                    <i class="bi bi-inbox display-1 text-muted"></i>
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body py-5">
+                        <i class="bi bi-inboxes display-1 text-muted mb-3"></i>
+                        <h3 class="h4">No items found</h3>
+                        <p class="text-muted mb-4">Try adjusting your search or filters</p>
+                        <button class="btn btn-primary" id="clearAllFilters">
+                            <i class="bi bi-arrow-clockwise me-1"></i>Clear All Filters
+                        </button>
+                    </div>
                 </div>
-                <h3 class="h4">No items found</h3>
-                <p class="text-muted">Try adjusting your search or filters</p>
             </div>
             
             <!-- End of Results Message -->
-            <div id="endOfResults" class="text-center py-3 d-none">
-                <p class="text-muted">You've reached the end of the list</p>
+            <div id="endOfResults" class="text-center py-5 d-none">
+                <div class="alert alert-info border-0">
+                    <i class="bi bi-info-circle me-2"></i>
+                    You've reached the end of the list
+                </div>
             </div>
         </div>
     </div>
+</div>
+{% endblock %}
+
+{% block floating_buttons %}
+<div class="position-fixed bottom-4 end-4 z-3 d-flex flex-column gap-3">
+    <a href="{{ url_for('lost_and_found.new_report') }}" 
+       class="btn btn-primary btn-lg shadow-lg rounded-circle d-flex align-items-center justify-content-center hover-lift animate__animated animate__pulse animate__infinite animate__slower"
+       style="width: 60px; height: 60px;"
+       title="Report New Item"
+       aria-label="Report New Item">
+        <i class="bi bi-plus-lg fs-4"></i>
+    </a>
 </div>
 {% endblock %}
 
@@ -304,10 +441,10 @@
 <script>
 // Configuration
 const API_ROUTES = {
-    SEARCH: '{{ url_for("lost_and_found.search_items") }}',
-    ITEMS: '{{ url_for("lost_and_found.get_items_api") }}',
-    CATEGORIES: '{{ url_for("lost_and_found.get_categories") }}',
-    STATS: '{{ url_for("lost_and_found.get_stats") }}'
+    SEARCH: '/lost_and_found/api/items/search',
+    ITEMS: '/lost_and_found/api',
+    CATEGORIES: '/lost_and_found/categories',
+    LOCATIONS: '/lost_and_found/locations'
 };
 
 // State management
@@ -334,63 +471,82 @@ const categoryFilter = document.getElementById('categoryFilter');
 const dateFilter = document.getElementById('dateFilter');
 const locationFilter = document.getElementById('locationFilter');
 const itemTypeRadios = document.querySelectorAll('input[name="itemType"]');
-
-// Stats elements
-const totalItems = document.getElementById('totalItems');
-const lostItemsCount = document.getElementById('lostItemsCount');
-const foundItemsCount = document.getElementById('foundItemsCount');
-const reunitedCount = document.getElementById('reunitedCount');
+const clearFiltersBtn = document.getElementById('clearFilters');
+const clearAllFiltersBtn = document.getElementById('clearAllFilters');
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', function() {
-    loadStats();
+    console.log('Lost & Found page initialized');
+    
+    // Initialize animations
+    initializeAnimations();
+    
+    // Load data
     loadCategories();
     loadItems();
+    
+    // Setup event listeners
     setupEventListeners();
+    
+    // Setup lazy loading
     setupIntersectionObserver();
+    
+    // Theme handling
+    setupThemeHandling();
 });
 
-// Load statistics
-async function loadStats() {
-    try {
-        const response = await fetch(API_ROUTES.STATS);
-        if (response.ok) {
-            const stats = await response.json();
-            animateCounter(totalItems, stats.total_items || 0);
-            animateCounter(lostItemsCount, stats.lost_count || 0);
-            animateCounter(foundItemsCount, stats.found_count || 0);
-            animateCounter(reunitedCount, stats.reunited_count || 0);
-        }
-    } catch (error) {
-        console.error('Failed to load stats:', error);
-    }
+function initializeAnimations() {
+    // Add scroll animations
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate__animated', 'animate__fadeInUp');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+    
+    // Observe elements for animation
+    document.querySelectorAll('.card, .btn-group, .text-center').forEach(el => {
+        observer.observe(el);
+    });
 }
 
-function animateCounter(element, target) {
-    const duration = 2000; // 2 seconds
-    const step = target / (duration / 16); // 60fps
-    let current = 0;
+function setupThemeHandling() {
+    // Update navbar theme icon
+    const navbarThemeToggle = document.getElementById('navbarThemeToggle');
+    if (navbarThemeToggle) {
+        const floatingThemeToggle = document.getElementById('themeToggle');
+        
+        navbarThemeToggle.addEventListener('click', function() {
+            floatingThemeToggle.click();
+            updateNavbarThemeIcon();
+        });
+        
+        updateNavbarThemeIcon();
+    }
     
-    const updateCount = () => {
-        current += step;
-        if (current < target) {
-            element.textContent = Math.floor(current);
-            requestAnimationFrame(updateCount);
-        } else {
-            element.textContent = target;
-        }
-    };
-    
-    updateCount();
+    function updateNavbarThemeIcon() {
+        const navbarThemeToggle = document.getElementById('navbarThemeToggle');
+        if (!navbarThemeToggle) return;
+        const isDark = document.body.classList.contains('dark-theme');
+        navbarThemeToggle.innerHTML = isDark 
+            ? '<i class="bi bi-sun-fill"></i>' 
+            : '<i class="bi bi-moon-fill"></i>';
+    }
 }
 
 // Load categories for filter dropdown
 async function loadCategories() {
     try {
+        console.log('Loading categories...');
         const response = await fetch(API_ROUTES.CATEGORIES);
         if (response.ok) {
             const categories = await response.json();
+            console.log('Categories loaded:', categories.length);
             populateCategoryFilter(categories);
+        } else {
+            console.error('Failed to load categories:', response.status);
         }
     } catch (error) {
         console.error('Failed to load categories:', error);
@@ -398,10 +554,12 @@ async function loadCategories() {
 }
 
 function populateCategoryFilter(categories) {
+    if (!categoryFilter) return;
+    
     categoryFilter.innerHTML = '<option value="">All Categories</option>';
     categories.forEach(category => {
         const option = document.createElement('option');
-        option.value = category.id || category.name;
+        option.value = category.id;
         option.textContent = category.name;
         categoryFilter.appendChild(option);
     });
@@ -410,56 +568,95 @@ function populateCategoryFilter(categories) {
 // Setup event listeners
 function setupEventListeners() {
     // Search form submission
-    searchForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        currentFilters.search = searchInput.value.trim();
-        currentFilters.status = statusFilter.value;
-        currentFilters.category = categoryFilter.value;
-        currentFilters.date = dateFilter.value;
-        currentFilters.location = locationFilter.value;
-        
-        currentPage = 1;
-        itemsGrid.innerHTML = '';
-        hasMore = true;
-        loadItems();
-    });
-
-    // Item type filter changes
-    itemTypeRadios.forEach(radio => {
-        radio.addEventListener('change', function() {
-            if (this.id === 'lostItems') {
-                currentFilters.status = 'lost';
-            } else if (this.id === 'foundItems') {
-                currentFilters.status = 'found';
-            } else {
-                currentFilters.status = '';
-            }
+    if (searchForm) {
+        searchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log('Search form submitted');
             
+            // Add search animation
+            const searchBtn = this.querySelector('button[type="submit"]');
+            const originalHtml = searchBtn.innerHTML;
+            searchBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Searching...';
+            searchBtn.disabled = true;
+            
+            // Update filters
+            currentFilters.search = searchInput ? searchInput.value.trim() : '';
+            currentFilters.status = statusFilter ? statusFilter.value : '';
+            currentFilters.category = categoryFilter ? categoryFilter.value : '';
+            currentFilters.date = dateFilter ? dateFilter.value : '';
+            currentFilters.location = locationFilter ? locationFilter.value : '';
+            
+            // Reset and load
             currentPage = 1;
             itemsGrid.innerHTML = '';
             hasMore = true;
-            loadItems();
+            
+            loadItems().finally(() => {
+                // Restore button
+                setTimeout(() => {
+                    searchBtn.innerHTML = originalHtml;
+                    searchBtn.disabled = false;
+                }, 500);
+            });
         });
-    });
+    }
 
-    // Clear all filters
-    const clearFiltersBtn = document.createElement('button');
-    clearFiltersBtn.className = 'btn btn-sm btn-outline-secondary mt-2';
-    clearFiltersBtn.innerHTML = '<i class="bi bi-x-circle me-1"></i>Clear Filters';
-    clearFiltersBtn.onclick = clearFilters;
-    document.querySelector('#advancedFilters .row').appendChild(clearFiltersBtn);
+    // Item type filter changes
+    if (itemTypeRadios.length > 0) {
+        itemTypeRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                console.log('Item type changed:', this.id);
+                if (this.id === 'lostItems') {
+                    currentFilters.status = 'lost';
+                } else if (this.id === 'foundItems') {
+                    currentFilters.status = 'found';
+                } else {
+                    currentFilters.status = '';
+                }
+                
+                // Reset and load
+                currentPage = 1;
+                itemsGrid.innerHTML = '';
+                hasMore = true;
+                loadItems();
+            });
+        });
+    }
+
+    // Clear filters button
+    if (clearFiltersBtn) {
+        clearFiltersBtn.addEventListener('click', function() {
+            // Add animation
+            this.classList.add('animate__animated', 'animate__shakeX');
+            setTimeout(() => {
+                this.classList.remove('animate__animated', 'animate__shakeX');
+            }, 1000);
+            
+            clearFilters();
+        });
+    }
+    
+    // Clear all filters button
+    if (clearAllFiltersBtn) {
+        clearAllFiltersBtn.addEventListener('click', clearFilters);
+    }
 }
 
 function clearFilters() {
-    searchInput.value = '';
-    statusFilter.value = '';
-    categoryFilter.value = '';
-    dateFilter.value = '';
-    locationFilter.value = '';
+    console.log('Clearing filters');
+    
+    // Clear all filter inputs
+    if (searchInput) searchInput.value = '';
+    if (statusFilter) statusFilter.value = '';
+    if (categoryFilter) categoryFilter.value = '';
+    if (dateFilter) dateFilter.value = '';
+    if (locationFilter) locationFilter.value = '';
     
     // Reset radio buttons
-    document.getElementById('allItems').checked = true;
+    const allItemsRadio = document.getElementById('allItems');
+    if (allItemsRadio) allItemsRadio.checked = true;
     
+    // Reset filters object
     currentFilters = {
         search: '',
         status: '',
@@ -468,8 +665,9 @@ function clearFilters() {
         location: ''
     };
     
+    // Reset and load
     currentPage = 1;
-    itemsGrid.innerHTML = '';
+    if (itemsGrid) itemsGrid.innerHTML = '';
     hasMore = true;
     loadItems();
 }
@@ -478,6 +676,7 @@ function clearFilters() {
 function setupIntersectionObserver() {
     const observer = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMore && !isLoading) {
+            console.log('Loading more items...');
             loadItems();
         }
     }, { threshold: 0.1 });
@@ -486,8 +685,11 @@ function setupIntersectionObserver() {
     const sentinel = document.createElement('div');
     sentinel.id = 'sentinel';
     sentinel.style.height = '10px';
-    itemsGrid.parentNode.appendChild(sentinel);
-    observer.observe(sentinel);
+    sentinel.style.visibility = 'hidden';
+    if (itemsGrid && itemsGrid.parentNode) {
+        itemsGrid.parentNode.appendChild(sentinel);
+        observer.observe(sentinel);
+    }
 }
 
 // Load items from API
@@ -495,54 +697,82 @@ async function loadItems() {
     if (isLoading || !hasMore) return;
     
     isLoading = true;
-    loadingSpinner.classList.remove('d-none');
-    noResults.classList.add('d-none');
-    endOfResults.classList.add('d-none');
+    console.log(`Loading page ${currentPage} with filters:`, currentFilters);
+    
+    if (loadingSpinner) loadingSpinner.classList.remove('d-none');
+    if (noResults) noResults.classList.add('d-none');
+    if (endOfResults) endOfResults.classList.add('d-none');
 
     try {
         // Build query parameters
         const params = new URLSearchParams({
             page: currentPage,
-            per_page: 12,
-            ...currentFilters
+            per_page: 12
         });
         
+        // Add non-empty filters
+        Object.entries(currentFilters).forEach(([key, value]) => {
+            if (value && value !== '') {
+                params.append(key, value);
+            }
+        });
+        
+        console.log('Fetching from:', `${API_ROUTES.ITEMS}?${params}`);
         const response = await fetch(`${API_ROUTES.ITEMS}?${params}`);
         
-        if (!response.ok) throw new Error('Failed to fetch items');
+        if (!response.ok) {
+            throw new Error(`Failed to fetch items: ${response.status} ${response.statusText}`);
+        }
         
         const data = await response.json();
+        console.log('Response data:', data);
         
         if (data.items && data.items.length > 0) {
+            // Update results count
             renderItems(data.items);
             currentPage++;
             hasMore = data.has_more || false;
             
             if (!hasMore && currentPage > 1) {
-                endOfResults.classList.remove('d-none');
+                if (endOfResults) {
+                    endOfResults.classList.remove('d-none');
+                    console.log('End of results reached');
+                }
             }
         } else {
             if (currentPage === 1) {
-                itemsGrid.innerHTML = '';
-                noResults.classList.remove('d-none');
+                if (noResults) {
+                    noResults.classList.remove('d-none');
+                    console.log('No items found');
+                }
             }
             hasMore = false;
-            endOfResults.classList.remove('d-none');
+            if (endOfResults) endOfResults.classList.remove('d-none');
         }
     } catch (error) {
         console.error('Error loading items:', error);
         showError('Failed to load items. Please try again.');
+        
+        // Show no results on error for first page
+        if (currentPage === 1 && noResults) {
+            noResults.classList.remove('d-none');
+        }
     } finally {
         isLoading = false;
-        loadingSpinner.classList.add('d-none');
+        if (loadingSpinner) loadingSpinner.classList.add('d-none');
     }
 }
 
 // Render items to the grid
 function renderItems(items) {
-    items.forEach(item => {
+    console.log(`Rendering ${items.length} items`);
+    items.forEach((item, index) => {
         const itemCard = createItemCard(item);
-        itemsGrid.appendChild(itemCard);
+        // Add delay based on index for staggered animation
+        itemCard.style.animationDelay = `${index * 0.1}s`;
+        if (itemsGrid) {
+            itemsGrid.appendChild(itemCard);
+        }
     });
 }
 
@@ -550,56 +780,60 @@ function renderItems(items) {
 function createItemCard(item) {
     const col = document.createElement('div');
     col.className = 'col-md-6 col-lg-4 col-xl-3';
+    col.style.animation = 'fadeInUp 0.6s ease-out';
+
+    // Status badge with theme-aware colors
+    let statusBadge = '';
+    let statusClass = '';
     
-    const statusBadge = item.status === 'lost' 
-        ? '<span class="badge bg-danger animate-pulse">Lost</span>'
-        : '<span class="badge bg-success">Found</span>';
-    
-    let imageUrl = '{{ url_for("static", filename="images/default.png") }}';  // Default image
+    if (item.status === 'lost') {
+        statusBadge = 'Lost';
+        statusClass = 'bg-danger';
+    } else if (item.status === 'found') {
+        statusBadge = 'Found';
+        statusClass = 'bg-success';
+    } else if (item.status === 'claimed') {
+        statusBadge = 'Claimed';
+        statusClass = 'bg-primary';
+    } else if (item.status === 'recovered') {
+        statusBadge = 'Recovered';
+        statusClass = 'bg-info';
+    }
+
+    let imageUrl = '/static/images/default.png';
     
     if (item.images && item.images.length > 0 && item.images[0].image_url) {
-        // Get the raw URL from the database
         let rawUrl = item.images[0].image_url;
-        
-        // Apply the same transformations as Jinja2 template
-        // Replace 'app\' with empty string
+        // Process the URL
         let processedUrl = rawUrl.replace(/app\\/g, '');
-        
-        // Replace all backslashes with forward slashes
         processedUrl = processedUrl.replace(/\\/g, '/');
-        
-        // Ensure it starts with '/'
         if (!processedUrl.startsWith('/')) {
             processedUrl = '/' + processedUrl;
         }
-        
         imageUrl = processedUrl;
-    }    
+    }
+    
     const reporterName = item.reporter_name || 'Anonymous';
     const location = item.location_name || 'Unknown location';
-    const category = item.category_name || 'Uncategorized';
+    const timeAgo = getTimeAgo(item.created_at);
     
     col.innerHTML = `
-        <div class="card h-100 shadow-sm hover-shadow theme-card animate__animated animate__fadeIn">
-            <div class="position-relative overflow-hidden">
+        <div class="card h-100 shadow-sm hover-lift item-card">
+            <div class="position-relative">
                 <img src="${imageUrl}" 
                      class="card-img-top" 
                      alt="${item.name}"
                      style="height: 200px; object-fit: cover;"
                      loading="lazy"
-                     onerror="this.src='{{ url_for('static', filename='images/default.png') }}'">
+                     onerror="this.src='/static/images/default.png'">
                 <div class="position-absolute top-0 end-0 m-2">
-                    ${statusBadge}
+                    <span class="badge ${statusClass}">${statusBadge}</span>
                 </div>
             </div>
             <div class="card-body d-flex flex-column">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                    <h5 class="card-title text-truncate flex-grow-1 me-2">${item.name}</h5>
-                    <small class="text-muted text-nowrap">${formatDate(item.created_at)}</small>
-                </div>
-                <small class="badge bg-primary mb-2 align-self-start">${category}</small>
+                <h5 class="card-title text-truncate">${item.name}</h5>
                 <p class="card-text small text-muted flex-grow-1 mb-3">
-                    ${item.description ? (item.description.length > 100 ? item.description.substring(0, 100) + '...' : item.description) : 'No description provided.'}
+                    ${item.description || 'No description provided.'}
                 </p>
                 <div class="mt-auto">
                     <div class="d-flex justify-content-between align-items-center mb-2">
@@ -607,13 +841,16 @@ function createItemCard(item) {
                             <i class="bi bi-person me-1"></i>${reporterName}
                         </small>
                         <small class="text-muted">
-                            <i class="bi bi-geo-alt me-1"></i>${location}
+                            <i class="bi bi-clock me-1"></i>${timeAgo}
                         </small>
                     </div>
-                    <div class="d-grid">
-                        <button class="btn btn-outline-primary btn-sm" 
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            <i class="bi bi-geo-alt me-1"></i>${location}
+                        </small>
+                        <button class="btn btn-sm btn-outline-primary" 
                                 onclick="viewItemDetail(${item.id})">
-                            <i class="bi bi-eye me-1"></i>View Details
+                            <i class="bi bi-eye me-1"></i>View
                         </button>
                     </div>
                 </div>
@@ -621,162 +858,182 @@ function createItemCard(item) {
         </div>
     `;
     
+    // Add hover effect
+    const card = col.querySelector('.card');
+    col.addEventListener('mouseenter', () => {
+        card.style.transform = 'translateY(-5px)';
+        card.style.borderColor = 'var(--primary-color)';
+    });
+    
+    col.addEventListener('mouseleave', () => {
+        card.style.transform = 'translateY(0)';
+        card.style.borderColor = '';
+    });
+    
     return col;
 }
 
 // Utility functions
 function formatDate(dateString) {
     if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric'
+    try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        });
+    } catch (e) {
+        return dateString;
+    }
+}
+// Fix accordion icon colors for theme switching
+function updateAccordionIcons() {
+    const accordionButtons = document.querySelectorAll('.accordion-button');
+    const isDark = document.body.classList.contains('dark-theme');
+    
+    accordionButtons.forEach(button => {
+        if (isDark) {
+            button.style.setProperty('--icon-filter', '1');
+        } else {
+            button.style.setProperty('--icon-filter', '0');
+        }
     });
 }
 
+// Update accordion icons when theme changes
+document.addEventListener('DOMContentLoaded', function() {
+    updateAccordionIcons();
+    
+    // Observe theme changes
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.attributeName === 'class') {
+                setTimeout(updateAccordionIcons, 100);
+            }
+        });
+    });
+    
+    observer.observe(document.body, { attributes: true });
+});
+
+function getTimeAgo(dateString) {
+    if (!dateString) return '';
+    try {
+        const date = new Date(dateString);
+        const now = new Date();
+        const seconds = Math.floor((now - date) / 1000);
+        
+        if (seconds < 60) return "Just now";
+        if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+        if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+        if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
+        return date.toLocaleDateString();
+    } catch (e) {
+        return dateString;
+    }
+}
+
 function viewItemDetail(itemId) {
-    window.location.href = `{{ url_for("lost_and_found.item_detail") }}?id=${itemId}`;
+    console.log('Viewing item:', itemId);
+    window.location.href = `/lost_and_found/item?id=${itemId}`;
 }
 
 function showError(message) {
-    // Create error toast
+    console.error('Error:', message);
+    
+    // Create toast notification
     const toast = document.createElement('div');
-    toast.className = 'toast align-items-center text-white bg-danger border-0 position-fixed bottom-0 end-0 m-3';
-    toast.style.zIndex = '1060';
+    toast.className = 'position-fixed bottom-0 end-0 m-3';
+    toast.style.zIndex = '9999';
     toast.innerHTML = `
-        <div class="d-flex">
+        <div class="toast show" role="alert">
+            <div class="toast-header bg-danger text-white">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                <strong class="me-auto">Error</strong>
+                <button type="button" class="btn-close btn-close-white" onclick="this.parentElement.parentElement.remove()"></button>
+            </div>
             <div class="toast-body">
                 ${message}
             </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
         </div>
     `;
     document.body.appendChild(toast);
     
-    const bsToast = new bootstrap.Toast(toast);
-    bsToast.show();
-    
-    // Remove toast after hide
-    toast.addEventListener('hidden.bs.toast', () => {
-        toast.remove();
-    });
+    setTimeout(() => {
+        if (toast.parentNode) {
+            toast.remove();
+        }
+    }, 5000);
 }
 
-// Add animation styles
+// Initialize EnhancedNotificationManager from functions.js
+if (document.getElementById('notificationDropdown')) {
+    // Wait for functions.js to initialize
+    setTimeout(() => {
+        if (window.notificationManager) {
+            console.log('Notification manager initialized');
+        }
+    }, 1000);
+}
+
+// Add custom animations
 const style = document.createElement('style');
 style.textContent = `
-    .navbar-theme {
-        background: var(--glass-bg) !important;
-        backdrop-filter: blur(10px) !important;
-        border-bottom: 1px solid var(--glass-border) !important;
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
     
-    .nav-link-theme {
-        color: var(--text-primary) !important;
-    }
-    
-    .nav-link-theme:hover {
-        color: var(--primary-color) !important;
-    }
-    
-    .theme-dropdown {
-        background: var(--glass-bg) !important;
-        backdrop-filter: blur(10px) !important;
-        border: 1px solid var(--glass-border) !important;
-    }
-    
-    .theme-dropdown-header {
-        background: var(--surface-color) !important;
-        color: var(--text-primary) !important;
-    }
-    
-    .dropdown-item {
-        color: var(--text-primary) !important;
-    }
-    
-    .dropdown-item:hover {
-        background: var(--primary-color) !important;
-        color: var(--background-color) !important;
-    }
-    
-    .theme-card {
-        background: var(--glass-bg) !important;
-        backdrop-filter: blur(10px) !important;
-        border: 1px solid var(--glass-border) !important;
+    .hover-lift {
         transition: all 0.3s ease;
     }
     
-    .theme-card:hover {
+    .hover-lift:hover {
         transform: translateY(-5px);
-        box-shadow: 0 15px 30px var(--shadow-color) !important;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
     }
     
-    .theme-card .card-title {
-        color: var(--text-primary) !important;
+    .dark-theme .hover-lift:hover {
+        box-shadow: 0 15px 30px rgba(255,215,0,0.15) !important;
     }
     
-    .theme-card .card-text {
-        color: var(--text-secondary) !important;
+    .item-card {
+        transition: all 0.3s ease;
+        border: 1px solid var(--border-color);
     }
     
-    .stats-section {
-        background: var(--glass-bg) !important;
-        backdrop-filter: blur(10px) !important;
-        border: 1px solid var(--glass-border) !important;
-    }
-    
-    .stat-item {
-        padding: 1rem;
-    }
-    
-    .stat-item .stat-number {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: var(--primary-color);
-        margin-bottom: 0.5rem;
-    }
-    
-    .stat-item .stat-label {
-        color: var(--text-secondary);
-        font-size: 0.9rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-    
-    .hover-shadow {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    
-    .hover-shadow:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 25px var(--shadow-color) !important;
-    }
-    
-    .animate-pulse {
-        animation: pulse 2s infinite;
-    }
-    
-    @keyframes pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.7; }
+    .item-card:hover {
+        border-color: var(--primary-color);
     }
     
     #sentinel {
         visibility: hidden;
+        height: 10px;
+    }
+    
+    /* Pulse animation for floating button */
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0.7);
+        }
+        70% {
+            box-shadow: 0 0 0 10px rgba(var(--primary-rgb), 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0);
+        }
     }
 `;
 document.head.appendChild(style);
-</script>
-{% endblock %}
 
-{% block floating_buttons %}
-<div class="position-fixed" style="bottom: 100px; right: 30px; z-index: 1030;">
-    <a href="{{ url_for('lost_and_found.new_report') }}" 
-       class="btn btn-primary btn-lg shadow-lg rounded-circle d-flex align-items-center justify-content-center pulse-animation"
-       style="width: 60px; height: 60px;"
-       title="Report New Item"
-       aria-label="Report New Item">
-        <i class="bi bi-plus-lg fs-4"></i>
-    </a>
-</div>
+// Debug logging
+console.log('Lost & Found page JavaScript loaded successfully');
+</script>
 {% endblock %}

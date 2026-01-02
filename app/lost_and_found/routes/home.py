@@ -110,6 +110,8 @@ def search_items(user):
         status = filters.get('status')
         if status in ['lost', 'found']:
             query = query.filter(Item.status == status)
+        else:
+            query = query.filter(Item.status.in_(['lost', 'found']))
         
         # Apply category filter
         category_ids = filters.get('category_ids', [])
@@ -151,8 +153,12 @@ def search_items(user):
         paginated = query.paginate(page=page, per_page=per_page, error_out=False)
         
         # Serialize results
-        items = [item.to_dict() for item in paginated.items]
-        
+
+        items = []
+        for item in paginated.items:
+            if item.status not in ['lost', 'found']:
+                continue
+            items.append(item.to_dict())
         return jsonify({
             'items': items,
             'has_more': paginated.has_next,
@@ -278,6 +284,8 @@ def item(user):
                 
         elif item.status == 'claimed':
             claim_message = f"Claimed by {item_dict.get('claimed_by_name', 'someone')}"
+        elif item.status == 'recovered':
+            claim_message = "This item has been recovered"
         
         # Format dates nicely
         if item_dict.get('created_at'):
@@ -311,3 +319,5 @@ def item(user):
         current_app.logger.exception(f"Failed to render item detail for id={request.args.get('id')}")
         flash(f"An error occurred while loading the item details", "danger")
         return redirect(url_for('lost_and_found.lost_and_found_page'))
+
+

@@ -1,28 +1,67 @@
 {% extends "layout.html" %}
+
 {% block title %}Claims Management | Lost & Found{% endblock %}
+
 {% block extras %}    
     <style>
+        /* Theme-aware CSS variables */
         :root {
             --primary-color: #3b82f6;
-            --primary-gradient: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            --primary-light: #60a5fa;
+            --primary-dark: #1d4ed8;
+            --primary-rgb: 59, 130, 246;
+            --secondary-color: #f8f9fa;
+            --background-color: #ffffff;
+            --surface-color: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --border-color: #e2e8f0;
+            --shadow-color: rgba(0, 0, 0, 0.08);
             --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
             --hover-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            --danger-color: #dc3545;
+            --danger-light: #e53e3e;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+        }
+
+        .dark-theme {
+            --primary-color: #FFD700;
+            --primary-light: #FFE55C;
+            --primary-dark: #B8860B;
+            --primary-rgb: 255, 215, 0;
+            --secondary-color: #000000;
+            --background-color: #0a0a0a;
+            --surface-color: #111111;
+            --text-primary: #f8f8f8;
+            --text-secondary: #a0a0a0;
+            --border-color: #333333;
+            --shadow-color: rgba(0, 0, 0, 0.5);
+            --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            --hover-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            --danger-color: #dc3545;
+            --danger-light: #e53e3e;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
         }
 
         .claims-container {
             min-height: 100vh;
-            background-color: #f8f9fa;
+            background-color: var(--surface-color);
             padding-bottom: 3rem;
+            color: var(--text-primary);
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .claim-card {
-            background: white;
+            background: var(--background-color);
             border-radius: 16px;
             padding: 1.5rem;
             box-shadow: var(--card-shadow);
             transition: all 0.3s ease;
-            border: none;
+            border: 1px solid var(--border-color);
             margin-bottom: 1rem;
+            color: var(--text-primary);
         }
 
         .claim-card:hover {
@@ -72,35 +111,36 @@
         }
 
         .action-btn-primary {
-            background: var(--primary-gradient);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
             color: white;
         }
 
         .action-btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 8px 20px rgba(var(--primary-rgb), 0.3);
             color: white;
         }
 
         .action-btn-outline {
-            border: 2px solid #dee2e6;
+            border: 2px solid var(--border-color);
             background: transparent;
-            color: #495057;
+            color: var(--text-primary);
         }
 
         .action-btn-outline:hover {
             border-color: var(--primary-color);
-            background-color: rgba(59, 130, 246, 0.05);
+            background-color: rgba(var(--primary-rgb), 0.1);
         }
 
         .empty-state {
             padding: 4rem 2rem;
             text-align: center;
+            color: var(--text-primary);
         }
 
         .empty-state-icon {
             font-size: 4rem;
-            color: #dee2e6;
+            color: var(--border-color);
             margin-bottom: 1.5rem;
         }
 
@@ -111,28 +151,29 @@
         }
 
         .nav-tabs {
-            border-bottom: 2px solid #dee2e6;
+            border-bottom: 2px solid var(--border-color);
             margin-bottom: 2rem;
         }
 
         .nav-tabs .nav-link {
             border: none;
-            color: #6c757d;
+            color: var(--text-secondary);
             font-weight: 600;
             padding: 0.75rem 1.5rem;
             border-radius: 8px 8px 0 0;
             margin-right: 0.5rem;
+            transition: all 0.3s ease;
         }
 
         .nav-tabs .nav-link.active {
             color: var(--primary-color);
-            background-color: rgba(59, 130, 246, 0.1);
+            background-color: rgba(var(--primary-rgb), 0.1);
             border-bottom: 3px solid var(--primary-color);
         }
 
         .nav-tabs .nav-link:hover:not(.active) {
             color: var(--primary-color);
-            background-color: rgba(59, 130, 246, 0.05);
+            background-color: rgba(var(--primary-rgb), 0.05);
         }
 
         .item-image {
@@ -140,7 +181,47 @@
             height: 80px;
             object-fit: cover;
             border-radius: 10px;
-            border: 2px solid #e9ecef;
+            border: 2px solid var(--border-color);
+        }
+
+        /* Fix for headings and text */
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--text-primary);
+        }
+        
+        p, span, div {
+            color: var(--text-primary);
+        }
+        
+        .text-muted {
+            color: var(--text-secondary) !important;
+        }
+
+        /* Modal Styles */
+        .modal-content {
+            background-color: var(--background-color);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .modal-header {
+            border-bottom-color: var(--border-color);
+        }
+
+        .modal-footer {
+            border-top-color: var(--border-color);
+        }
+
+        .modal-title {
+            color: var(--text-primary);
+        }
+
+        .btn-close {
+            filter: invert(var(--btn-close-filter, 0));
+        }
+
+        .dark-theme .btn-close {
+            filter: invert(1);
         }
 
         @media (max-width: 768px) {
@@ -160,96 +241,162 @@
         }
 
         ::-webkit-scrollbar-track {
-            background: #f1f1f1;
+            background: var(--surface-color);
             border-radius: 10px;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, #3b82f6, #1d4ed8);
+            background: linear-gradient(180deg, var(--primary-color), var(--primary-dark));
             border-radius: 10px;
+        }
+
+        /* Toast notification styles */
+        .toast {
+            background-color: var(--background-color);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .toast-header {
+            background-color: var(--surface-color);
+            border-bottom-color: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .toast-success .toast-header {
+            background-color: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+        }
+
+        .toast-error .toast-header {
+            background-color: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+        }
+
+        .toast-warning .toast-header {
+            background-color: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
         }
     </style>
 {% endblock %}
+
 {% block navbar %}
-        <!-- Navbar -->
-        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3">
-            <div class="container">
-                <a class="navbar-brand fw-bold d-flex align-items-center" href="{{ url_for('lost_and_found.lost_and_found_page') }}" style="color: var(--primary-color);">
-                    <i class="bi bi-search me-2 fs-4"></i>
-                    <span>Lost & Found</span>
-                </a>
-                
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto align-items-center">
-                        <!-- Notifications -->
-                        <li class="nav-item dropdown me-3">
-                            <a class="nav-link position-relative" href="#" id="notificationDropdown" role="button" 
-                               data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-bell fs-5"></i>
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
-                                      id="notificationBadge" style="display: none;">
-                                    0
-                                </span>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-glass fixed-top">
+    <div class="container">
+        <!-- Brand with Logo -->
+        <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('lost_and_found.lost_and_found_page') }}">
+            <div class="position-relative">
+                <i class="bi bi-search-heart fs-3 navbar-brand-glow"></i>
+                <span class="position-absolute top-0 start-100 translate-middle badge badge-pulse bg-danger" 
+                      style="display: none;" id="notificationBadge">
+                    0
+                </span>
+            </div>
+            <span class="navbar-brand-glow fs-4 fw-bold">Dhallati</span>
+        </a>
+        
+        <!-- Mobile Toggle -->
+        <button class="navbar-toggler navbar-toggler-custom" type="button" data-bs-toggle="collapse" 
+                data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" 
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <!-- Navbar Content -->
+        <div class="collapse navbar-collapse" id="mainNavbar">
+            <!-- Navigation Links -->
+            <ul class="navbar-nav mx-auto">
+            </ul>
+            
+            <!-- Right Side Actions -->
+            <div class="d-flex align-items-center gap-3">
+                <!-- Notifications Dropdown -->
+                <div class="dropdown">
+                    <a href="#" class="nav-link position-relative p-0" id="notificationDropdown" 
+                       role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-bell fs-5"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger badge-pulse" 
+                              id="notificationCount" style="font-size: 0.6rem; display: none;">
+                            0
+                        </span>
+                    </a>
+                    
+                    <ul class="dropdown-menu dropdown-menu-end notification-dropdown" aria-labelledby="notificationDropdown">
+                        <li class="dropdown-header notification-header d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Notifications</span>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-light" id="markAllReadBtn">
+                                    <i class="bi bi-check-all"></i>
+                                </button>
+                                <button class="btn btn-sm btn-light" id="refreshNotifications">
+                                    <i class="bi bi-arrow-clockwise"></i>
+                                </button>
+                            </div>
+                        </li>
+                        <div id="notificationList" class="py-2">
+                            <div class="text-center py-4 text-muted">
+                                <i class="bi bi-bell-slash fs-3 mb-2 d-block"></i>
+                                <p class="mb-0">No notifications yet</p>
+                                <small class="text-muted">We'll notify you when something happens</small>
+                            </div>
+                        </div>
+                        <li class="dropdown-footer p-3 text-center border-top">
+                            <a href="#" class="text-decoration-none small d-flex align-items-center justify-content-center gap-1">
+                                <i class="bi bi-eye"></i>
+                                View all notifications
                             </a>
-                            
-                            <ul class="dropdown-menu dropdown-menu-end p-0" style="width: 350px; max-height: 400px; overflow-y: auto;">
-                                <li class="dropdown-header bg-light d-flex justify-content-between align-items-center py-3">
-                                    <span class="fw-bold">Notifications</span>
-                                    <button class="btn btn-sm btn-outline-secondary py-1 px-2" id="markAllReadBtn">
-                                        Mark all read
-                                    </button>
-                                </li>
-                                <li><hr class="dropdown-divider m-0"></li>
-                                <div id="notificationList">
-                                    <div class="text-center py-4 text-muted">
-                                        <div class="spinner-border spinner-border-sm" role="status">
-                                            <span class="visually-hidden">Loading...</span>
-                                        </div>
-                                        <p class="mb-0 mt-2">Loading notifications...</p>
-                                    </div>
-                                </div>
-                                <li class="dropdown-footer text-center p-2">
-                                    <a href="{{ url_for('lost_and_found.claims_management') }}" class="text-decoration-none">
-                                        View all claims
-                                    </a>
-                                </li>
-                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Profile Dropdown -->
+                <div class="dropdown">
+                    <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" 
+                       id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        {% if user.profile_pic %}
+                        <img src="{{ user.profile_pic }}" class="profile-avatar" alt="{{ user.name }}">
+                        {% else %}
+                        <div class="profile-avatar bg-primary text-white d-flex align-items-center justify-content-center">
+                            {{ user.name[0]|upper }}
+                        </div>
+                        {% endif %}
+                        <span class="ms-2 d-none d-md-inline">{{ user.name }}</span>
+                    </a>
+                    
+                    <ul class="dropdown-menu dropdown-menu-end profile-dropdown" aria-labelledby="profileDropdown">
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2" href="{{ url_for('main.profile') }}">
+                                <i class="bi bi-person"></i>
+                                <span>Profile</span>
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li class="dropdown-item d-flex align-items-center gap-2">
+                            <i class="bi bi-gear"></i><a class="nav-link" href="{{ url_for('lost_and_found.claims_management') }}">Claims</a>
                         </li>
                         
-                        <!-- User avatar dropdown -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link d-flex align-items-center" href="#" id="userDropdown" role="button" 
-                               data-bs-toggle="dropdown" aria-expanded="false">
-                                <img src="{{ user.profile_pic if user and user.profile_pic else url_for('static', filename='images/default-avatar.png') }}" 
-                                     alt="{{ user.name if user else 'User' }}" class="rounded-circle me-2" width="36" height="36" style="object-fit: cover;">
-                                <span class="d-none d-md-inline">{{ user.name.split(' ')[0] if user else 'User' }}</span>
-                                <i class="bi bi-chevron-down ms-1 small"></i>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
-                                <li><a class="dropdown-item" href="{{ url_for('main.profile') }}"><i class="bi bi-person me-2"></i>Profile</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('lost_and_found.new_report') }}"><i class="bi bi-plus-circle me-2"></i>New Report</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('lost_and_found.claims_management') }}"><i class="bi bi-clipboard-check me-2"></i>My Claims</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <form action="{{ url_for('auth.logout') }}" method="GET">
-                                        <button type="submit" class="dropdown-item text-danger">
-                                            <i class="bi bi-box-arrow-right me-2"></i>Logout
-                                        </button>
-                                    </form>
-                                </li>
-                            </ul>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form action="{{ url_for('auth.logout') }}" method="GET" class="mb-0">
+                                <button type="submit" class="dropdown-item d-flex align-items-center gap-2 text-danger">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                    <span>Logout</span>
+                                </button>
+                            </form>
                         </li>
                     </ul>
                 </div>
             </div>
-        </nav>
-    {% endblock %}
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
 {% block main %}
-        <div class="container py-4">
+<div class="main-content">
+    <div class="container py-4">
+        <div class="container py-4 claims-container">
             <div class="row mb-4">
                 <div class="col-12">
                     <h1 class="fw-bold mb-3">Claims Management</h1>
@@ -297,9 +444,122 @@
             </div>
         </div>
     </div>
+</div>
+
+<!-- Accept Claim Modal -->
+<div class="modal fade" id="acceptClaimModal" tabindex="-1" aria-labelledby="acceptClaimModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="acceptClaimModalLabel">
+                    <i class="bi bi-check-circle text-success me-2"></i>Accept Claim
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to accept this claim?</p>
+                <p class="text-muted small mb-0">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Accepting means you agree to return the item to the claimant.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" id="confirmAcceptBtn">Accept Claim</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reject Claim Modal -->
+<div class="modal fade" id="rejectClaimModal" tabindex="-1" aria-labelledby="rejectClaimModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="rejectClaimModalLabel">
+                    <i class="bi bi-x-circle text-danger me-2"></i>Reject Claim
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to reject this claim?</p>
+                <div class="mb-3">
+                    <label for="rejectReason" class="form-label">Reason for rejection (optional):</label>
+                    <textarea class="form-control" id="rejectReason" rows="3" 
+                              placeholder="Provide a reason for rejection..."></textarea>
+                </div>
+                <p class="text-muted small mb-0">
+                    <i class="bi bi-info-circle me-1"></i>
+                    The claimant will be notified about your decision.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmRejectBtn">Reject Claim</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cancel Claim Modal -->
+<div class="modal fade" id="cancelClaimModal" tabindex="-1" aria-labelledby="cancelClaimModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cancelClaimModalLabel">
+                    <i class="bi bi-x-circle text-warning me-2"></i>Cancel Claim
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to cancel this claim?</p>
+                <p class="text-muted small mb-0">
+                    <i class="bi bi-info-circle me-1"></i>
+                    This action cannot be undone. The reporter will be notified.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-warning" id="confirmCancelBtn">Cancel Claim</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+    <div id="successToast" class="toast toast-success" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <i class="bi bi-check-circle-fill text-success me-2"></i>
+            <strong class="me-auto">Success</strong>
+            <small>Just now</small>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" id="successToastMessage">
+            Operation completed successfully.
+        </div>
+    </div>
+    
+    <div id="errorToast" class="toast toast-error" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>
+            <strong class="me-auto">Error</strong>
+            <small>Just now</small>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" id="errorToastMessage">
+            An error occurred.
+        </div>
+    </div>
+</div>
 {% endblock %}
+
 {% block scripts %}
     <script>
+        // Global variables
+        let currentClaimId = null;
+        let currentAction = null;
+
         // Function to format date
         function formatDate(dateString) {
             const date = new Date(dateString);
@@ -330,28 +590,17 @@
             const statusClass = getStatusClass(claim.status);
             let imageUrl = '/static/images/default.png';  // Default image
 
-            console.log('claim:', claim);
-    
             if (claim.item.image_url && claim.item.image_url !== '') {
-                console.log('claim.item.image_url:', claim.item.image_url);
-                // Get the raw URL from the database
                 let rawUrl = claim.item.image_url;
-                
-                // Apply the same transformations as Jinja2 template
-                // Replace 'app\' with empty string
                 let processedUrl = rawUrl.replace(/app\\/g, '');
-                
-                // Replace all backslashes with forward slashes
                 processedUrl = processedUrl.replace(/\\/g, '/');
                 
-                // Ensure it starts with '/'
                 if (!processedUrl.startsWith('/')) {
                     processedUrl = '/' + processedUrl;
                 }
                 
                 imageUrl = processedUrl;
-            }    
-            console.log('imageUrl:', imageUrl);
+            }
             
             return `
                 <div class="claim-card">
@@ -362,7 +611,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="d-flex align-items-center mb-2">
-                                <h5 class="fw-bold mb-0 me-3">${claim.item.name}</h5>
+                                <h5 class="fw-bold mb-0 me-3 text-primary">${claim.item.name}</h5>
                                 <span class="claim-status ${statusClass}">${claim.status}</span>
                             </div>
                             <p class="text-muted mb-2">
@@ -447,17 +696,12 @@
                         .join('');
                 }
                 
-                // Add event listeners
-                document.querySelectorAll('.respond-btn').forEach(btn => {
-                    btn.addEventListener('click', handleClaimResponse);
-                });
-                
-                document.querySelectorAll('.cancel-btn').forEach(btn => {
-                    btn.addEventListener('click', handleClaimCancel);
-                });
+                // Add event listeners to buttons
+                setupEventListeners();
                 
             } catch (error) {
                 console.error('Error loading claims:', error);
+                showToast('Failed to load claims. Please try again.', 'error');
                 const containers = ['received-claims-container', 'made-claims-container'];
                 containers.forEach(id => {
                     const container = document.getElementById(id);
@@ -472,18 +716,88 @@
             }
         }
 
-        // Handle claim response (accept/reject)
-        async function handleClaimResponse(event) {
-            const claimId = event.target.dataset.claimId;
-            const action = event.target.dataset.action;
+        // Setup event listeners for claim action buttons
+        function setupEventListeners() {
+            // Accept/Reject buttons
+            document.querySelectorAll('.respond-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    currentClaimId = this.dataset.claimId;
+                    currentAction = this.dataset.action;
+                    
+                    if (currentAction === 'accept') {
+                        const modal = new bootstrap.Modal(document.getElementById('acceptClaimModal'));
+                        modal.show();
+                    } else if (currentAction === 'reject') {
+                        const modal = new bootstrap.Modal(document.getElementById('rejectClaimModal'));
+                        document.getElementById('rejectReason').value = '';
+                        modal.show();
+                    }
+                });
+            });
             
-            const reason = action === 'reject' ? 
-                prompt('Please provide a reason for rejection (optional):') : '';
+            // Cancel buttons
+            document.querySelectorAll('.cancel-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    currentClaimId = this.dataset.claimId;
+                    const modal = new bootstrap.Modal(document.getElementById('cancelClaimModal'));
+                    modal.show();
+                });
+            });
+        }
+
+        // Setup modal confirm buttons
+        function setupModalListeners() {
+            // Accept confirmation
+            document.getElementById('confirmAcceptBtn').addEventListener('click', async function() {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('acceptClaimModal'));
+                this.disabled = true;
+                this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+                
+                try {
+                    await handleClaimAction(currentClaimId, 'accept', '');
+                    modal.hide();
+                } finally {
+                    this.disabled = false;
+                    this.innerHTML = 'Accept Claim';
+                }
+            });
             
-            if (action === 'reject' && reason === null) {
-                return; // User cancelled the prompt
-            }
+            // Reject confirmation
+            document.getElementById('confirmRejectBtn').addEventListener('click', async function() {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('rejectClaimModal'));
+                const reason = document.getElementById('rejectReason').value;
+                
+                this.disabled = true;
+                this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+                
+                try {
+                    await handleClaimAction(currentClaimId, 'reject', reason || '');
+                    modal.hide();
+                } finally {
+                    this.disabled = false;
+                    this.innerHTML = 'Reject Claim';
+                }
+            });
             
+            // Cancel confirmation
+            document.getElementById('confirmCancelBtn').addEventListener('click', async function() {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('cancelClaimModal'));
+                
+                this.disabled = true;
+                this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+                
+                try {
+                    await handleClaimCancel(currentClaimId);
+                    modal.hide();
+                } finally {
+                    this.disabled = false;
+                    this.innerHTML = 'Cancel Claim';
+                }
+            });
+        }
+
+        // Handle claim action (accept/reject)
+        async function handleClaimAction(claimId, action, reason) {
             try {
                 const response = await fetch(`/lost_and_found/api/claims/${claimId}/respond`, {
                     method: 'POST',
@@ -493,32 +807,26 @@
                     },
                     body: JSON.stringify({
                         action: action,
-                        reason: reason || ''
+                        reason: reason
                     })
                 });
                 
                 const data = await response.json();
                 
                 if (response.ok) {
-                    alert(data.message || `Claim ${action}ed successfully`);
+                    showToast(data.message || `Claim ${action}ed successfully`, 'success');
                     loadClaims(); // Reload claims
                 } else {
-                    alert(data.error || 'Failed to process request');
+                    showToast(data.error || 'Failed to process request', 'error');
                 }
             } catch (error) {
                 console.error('Error responding to claim:', error);
-                alert('An error occurred. Please try again.');
+                showToast('An error occurred. Please try again.', 'error');
             }
         }
 
         // Handle claim cancellation
-        async function handleClaimCancel(event) {
-            const claimId = event.target.dataset.claimId;
-            
-            if (!confirm('Are you sure you want to cancel this claim?')) {
-                return;
-            }
-            
+        async function handleClaimCancel(claimId) {
             try {
                 const response = await fetch(`/lost_and_found/api/claims/${claimId}/cancel`, {
                     method: 'POST',
@@ -531,18 +839,54 @@
                 const data = await response.json();
                 
                 if (response.ok) {
-                    alert(data.message || 'Claim cancelled successfully');
+                    showToast(data.message || 'Claim cancelled successfully', 'success');
                     loadClaims(); // Reload claims
                 } else {
-                    alert(data.error || 'Failed to cancel claim');
+                    showToast(data.error || 'Failed to cancel claim', 'error');
                 }
             } catch (error) {
                 console.error('Error cancelling claim:', error);
-                alert('An error occurred. Please try again.');
+                showToast('An error occurred. Please try again.', 'error');
             }
         }
 
-        // Load claims on page load
-        document.addEventListener('DOMContentLoaded', loadClaims);
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            const successToast = new bootstrap.Toast(document.getElementById('successToast'));
+            const errorToast = new bootstrap.Toast(document.getElementById('errorToast'));
+            
+            if (type === 'success') {
+                document.getElementById('successToastMessage').textContent = message;
+                successToast.show();
+            } else {
+                document.getElementById('errorToastMessage').textContent = message;
+                errorToast.show();
+            }
+        }
+
+        // Initialize theme for modals
+        function updateModalTheme() {
+            const isDark = document.body.classList.contains('dark-theme');
+            const btnCloseFilter = isDark ? '1' : '0';
+            document.documentElement.style.setProperty('--btn-close-filter', btnCloseFilter);
+        }
+
+        // Load claims and setup listeners on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadClaims();
+            setupModalListeners();
+            updateModalTheme();
+            
+            // Observe theme changes
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.attributeName === 'class') {
+                        setTimeout(updateModalTheme, 100);
+                    }
+                });
+            });
+            
+            observer.observe(document.body, { attributes: true });
+        });
     </script>
 {% endblock %}
