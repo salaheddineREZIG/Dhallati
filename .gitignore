@@ -2,3 +2,10 @@
 run.txt
 venv/
 __pycache__/
+*.pyc
+instance/
+.vscode/
+build/
+dist/
+node_modules/
+.idea/
