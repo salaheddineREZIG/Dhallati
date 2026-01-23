@@ -54,7 +54,7 @@ def callback():
             return redirect(url_for('auth.login'))
 
         # Enforce email domain
-        """domain = os.getenv('LAGH_UNI_DOMAIN')
+        domain = os.getenv('LAGH_UNI_DOMAIN')
         if not profile.get('email') or not domain:
             current_app.logger.warning("Missing profile email or LAGH_UNI_DOMAIN not set. profile=%s domain=%s", profile, domain)
             flash("Authentication configuration error. Contact admin.", "danger")
@@ -66,7 +66,6 @@ def callback():
             flash("Only Lagh University emails are allowed", "danger")
             return make_response(redirect(url_for('main.index')))
 
-        """
         # Check if User exists in db
         try:
             user = User.query.filter_by(google_id=profile['sub']).first()

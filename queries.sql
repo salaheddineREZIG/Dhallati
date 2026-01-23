@@ -1,6 +1,7 @@
---.schema
+.schema
 ----
 --DELETE FROM items;
+
 --DELETE FROM item_images;
 --DELETE FROM reports;
 --DELETE FROM users;

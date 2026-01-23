@@ -1,8 +1,8 @@
-"""initial migrate
+"""Switch to PostgreSQL and add predefined tables.
 
-Revision ID: 739b779230af
+Revision ID: 733fd51c3481
 Revises: 
-Create Date: 2025-12-26 19:17:42.952127
+Create Date: 2026-01-23 11:16:47.091186
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '739b779230af'
+revision = '733fd51c3481'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -43,8 +43,8 @@ def upgrade():
     sa.Column('name', sa.String(length=150), nullable=False),
     sa.Column('profile_pic', sa.String(length=512), nullable=True),
     sa.Column('is_active', sa.Boolean(), nullable=False),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
-    sa.Column('last_login_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('last_login_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('users', schema=None) as batch_op:
@@ -57,7 +57,7 @@ def upgrade():
     sa.Column('record_id', sa.Integer(), nullable=False),
     sa.Column('action', sa.String(length=50), nullable=False),
     sa.Column('performed_by', sa.Integer(), nullable=True),
-    sa.Column('performed_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
+    sa.Column('performed_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('changes', sa.Text(), nullable=True),
     sa.ForeignKeyConstraint(['performed_by'], ['users.id'], ondelete='SET NULL'),
     sa.PrimaryKeyConstraint('id')
@@ -79,8 +79,8 @@ def upgrade():
     sa.Column('found_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('returned_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('returned_to', sa.String(length=150), nullable=True),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.CheckConstraint("NOT (status = 'found' AND found_by_id IS NULL)", name='ck_found_item_has_finder'),
     sa.CheckConstraint("NOT (status = 'lost' AND found_by_id IS NOT NULL)", name='ck_lost_item_not_found'),
     sa.CheckConstraint("status IN ('lost', 'found', 'claimed', 'recovered')", name='ck_items_valid_status'),
@@ -111,8 +111,8 @@ def upgrade():
     sa.Column('verification_answers', sa.Text(), nullable=True),
     sa.Column('status', sa.String(length=20), nullable=False),
     sa.Column('reason', sa.Text(), nullable=True),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('resolved_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('expires_at', sa.DateTime(timezone=True), nullable=True),
     sa.CheckConstraint("status IN ('pending', 'accepted', 'rejected', 'cancelled')", name='ck_claims_valid_status'),
@@ -134,7 +134,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('item_id', sa.Integer(), nullable=False),
     sa.Column('image_url', sa.String(length=2000), nullable=False),
-    sa.Column('uploaded_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
+    sa.Column('uploaded_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['item_id'], ['items.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
@@ -151,8 +151,8 @@ def upgrade():
     sa.Column('is_anonymous', sa.Boolean(), nullable=False),
     sa.Column('contact_info', sa.String(length=10), nullable=False),
     sa.Column('event_datetime', sa.DateTime(timezone=True), nullable=True),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('location_id', sa.Integer(), nullable=True),
     sa.Column('specific_spot', sa.String(length=255), nullable=True),
     sa.CheckConstraint("NOT (report_type = 'lost' AND (contact_info IS NULL OR contact_info = ''))", name='ck_lost_reports_have_contact'),
@@ -178,7 +178,7 @@ def upgrade():
     sa.Column('notification_type', sa.String(length=30), nullable=False),
     sa.Column('message', sa.Text(), nullable=False),
     sa.Column('is_read', sa.Boolean(), nullable=False),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.CheckConstraint("notification_type IN ('item_found', 'claim_request', 'claim_request_anonymous', 'claim_accepted', 'claim_rejected', 'claim_cancelled', 'claim_accepted_confirmation', 'item_returned', 'item_claimed', 'item_recovered')", name='ck_notifications_valid_type'),
     sa.ForeignKeyConstraint(['claim_id'], ['claims.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['item_id'], ['items.id'], ondelete='SET NULL'),
@@ -196,7 +196,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('report_id', sa.Integer(), nullable=False),
     sa.Column('question', sa.Text(), nullable=False),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['report_id'], ['reports.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
@@ -204,10 +204,53 @@ def upgrade():
         batch_op.create_index(batch_op.f('ix_verification_questions_report_id'), ['report_id'], unique=False)
 
     # ### end Alembic commands ###
+    
+    # ### INSERT PRE-DEFINED DATA ###
+    
+    # Insert predefined categories
+    op.execute("""
+        INSERT INTO categories (name, description) VALUES
+        ('Electronics', 'Devices and accessories.'),
+        ('Clothing', 'Apparel and accessories.'),
+        ('Books & Stationery', 'Textbooks, notebooks, and writing supplies.'),
+        ('Bags & Wallets', 'Bags, purses, wallets, and related items.'),
+        ('Keys', 'Various types of keys.'),
+        ('ID Cards & Documents', 'Personal identification and important documents.'),
+        ('Sports Equipment', 'Equipment and accessories for sports activities.'),
+        ('Miscellaneous', 'Other items not fitting into the above categories.')
+        ON CONFLICT (name) DO NOTHING;
+    """)
+    
+    # Insert predefined locations
+    op.execute("""
+        INSERT INTO locations (name, description) VALUES
+        ('Library', 'Central library'),
+        ('Science Faculty', 'Science departments'),
+        ('Science Building', 'Science laboratories and classrooms'),
+        ('Engineering Building', 'Engineering departments'),
+        ('Main Cafeteria', 'Primary dining hall'),
+        ('Sports Complex', 'Gymnasium and sports facilities'),
+        ('Parking Lot A', 'Main entrance parking lot'),
+        ('Parking Lot B', 'parking lot facing the Science Faculty'),
+        ('Parking Lot C', 'parking lot near the Sports Complex'),
+        ('Administration Building', 'University administration offices'),
+        ('Computer Lab', 'Main computer laboratory'),
+        ('Auditorium Section', 'Large event hall'),
+        ('Dormitory A', 'North residence hall'),
+        ('Dormitory B', 'South residence hall')
+        ON CONFLICT (name) DO NOTHING;
+    """)
 
 
 def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
+    
+    # ### REMOVE PRE-DEFINED DATA (optional, as tables will be dropped) ###
+    # Note: Since tables are being dropped, we don't need to explicitly delete the data
+    # But if you want to clean up before dropping, you can uncomment these lines:
+    # op.execute("DELETE FROM categories WHERE name IN ('Electronics', 'Clothing', 'Books & Stationery', 'Bags & Wallets', 'Keys', 'ID Cards & Documents', 'Sports Equipment', 'Miscellaneous')")
+    # op.execute("DELETE FROM locations WHERE name IN ('Library', 'Science Faculty', 'Science Building', 'Engineering Building', 'Main Cafeteria', 'Sports Complex', 'Parking Lot A', 'Parking Lot B', 'Parking Lot C', 'Administration Building', 'Computer Lab', 'Auditorium Section', 'Dormitory A', 'Dormitory B')")
+    
     with op.batch_alter_table('verification_questions', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_verification_questions_report_id'))
 

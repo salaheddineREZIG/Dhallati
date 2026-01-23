@@ -96,7 +96,7 @@ class ReportItemForm(FlaskForm):
             Length(min=10, max=10, message='Phone number must be exactly 10 digits'),
             Regexp(r'^[0-9]{10}$', message='Enter a valid 10-digit phone number')
         ],
-        description="10-digit number (e.g., 0698166666). Required for all reports."
+        description="10-digit number starting with 0. Required for all reports."
     )
     
     verification_question = TextAreaField(
